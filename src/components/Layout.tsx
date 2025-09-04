@@ -37,7 +37,7 @@ export function Layout({
               <div>
                 <div className="font-mono text-lg font-bold">hyper.faith</div>
                 <div className="text-xs text-muted-foreground -mt-1">
-                  no one is atheist at 100x leverage
+                  nobody is atheist at 50x leverage
                 </div>
               </div>
             </Link>
