@@ -32,8 +32,8 @@ const mockTokens: OmamoriToken[] = [];
 export async function mintOmamoriMock(args: MintArgs): Promise<OmamoriToken> {
   const { majorId, minorId, offeringHype } = args;
   
-  // Validate HYPE amount (minimum 0.01 ETH in wei)
-  const minHype = BigInt('10000000000000000'); // 0.01 ETH in wei
+  // Validate HYPE amount (minimum 0.01 HYPE in wei)
+  const minHype = BigInt('10000000000000000'); // 0.01 HYPE in wei
   const hypeAmount = BigInt(offeringHype);
   
   if (hypeAmount < minHype) {
@@ -122,7 +122,7 @@ function generateSeededTokens(): OmamoriToken[] {
     const punchCount = getPunchCount(seed);
     
     // Vary HYPE amounts for interesting display
-    const baseHype = BigInt('10000000000000000'); // 0.01 ETH
+    const baseHype = BigInt('10000000000000000'); // 0.01 HYPE
     const multiplier = BigInt(Math.floor(Math.random() * 100) + 1); // 1-100x
     const hypeBurned = (baseHype * multiplier).toString();
     

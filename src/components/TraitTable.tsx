@@ -12,8 +12,8 @@ export function TraitTable({ token, className = "" }: TraitTableProps) {
   const minor = major?.minors[token.minorId];
   
   const formatHype = (wei: string) => {
-    const eth = parseFloat(wei) / 1e18;
-    return `${eth.toFixed(4)} ETH`;
+    const hype = parseFloat(wei) / 1e18;
+    return `${hype.toFixed(4)} HYPE`;
   };
 
   const formatDate = (timestamp: number) => {

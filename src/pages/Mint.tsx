@@ -40,7 +40,7 @@ export default function Mint() {
     try {
       setIsMinting(true);
       
-      // Convert ETH to wei
+      // Convert HYPE to wei
       const weiAmount = (parseFloat(hypeAmount) * 1e18).toString();
       
       const token = await mintOmamoriMock({

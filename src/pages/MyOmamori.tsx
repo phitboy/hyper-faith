@@ -91,8 +91,8 @@ export default function MyOmamori() {
   };
 
   const formatHype = (wei: string) => {
-    const eth = parseFloat(wei) / 1e18;
-    return `${eth.toFixed(4)} ETH`;
+    const hype = parseFloat(wei) / 1e18;
+    return `${hype.toFixed(4)} HYPE`;
   };
 
   if (!isConnected) {

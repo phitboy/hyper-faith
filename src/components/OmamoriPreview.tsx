@@ -94,7 +94,7 @@ export function OmamoriPreview({ className = "", seed: fixedSeed }: OmamoriPrevi
           </div>
           <div>
             <span className="text-muted-foreground">HYPE:</span>
-            <span className="ml-2 font-mono">{hypeAmount} ETH</span>
+            <span className="ml-2 font-mono">{hypeAmount} HYPE</span>
           </div>
         </div>
       </div>

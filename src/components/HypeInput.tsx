@@ -67,7 +67,7 @@ export function HypeInput() {
     <div className="space-y-3">
       <div>
         <label className="font-mono text-sm text-muted-foreground block mb-2">
-          HYPE Offering (ETH)
+          HYPE Offering
         </label>
         <div className="flex items-center gap-2">
           <Button
@@ -103,7 +103,7 @@ export function HypeInput() {
       </div>
       
       <div className="text-xs text-muted-foreground font-mono">
-        Minimum: 0.01 ETH • Current: {inputValue} ETH
+        Minimum: 0.01 HYPE • Current: {inputValue} HYPE
       </div>
     </div>
   );
