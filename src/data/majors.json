@@ -39,7 +39,7 @@
     "minors": [
       { "id": 0, "name": "Insider", "glyph": "●\n█\n●" },
       { "id": 1, "name": "Hype", "glyph": "※\n█\n※" },
-      { "id": 2, "name": "News", "glyph": "📰\n█\n📰" },
+      { "id": 2, "name": "News", "glyph": "N\n█\nN" },
       { "id": 3, "name": "Cope", "glyph": "⚆\n█\n⚆" }
     ]
   },
@@ -48,10 +48,10 @@
     "name": "The Macro",
     "glyph": "◣\n█\n█\n█\n◤",
     "minors": [
-      { "id": 0, "name": "Regulator", "glyph": "⚖\n█\n⚖" },
-      { "id": 1, "name": "Bear", "glyph": "🐻\n█\n🐻" },
-      { "id": 2, "name": "Bull", "glyph": "🐂\n█\n🐂" },
-      { "id": 3, "name": "Black Swan", "glyph": "🦢\n█\n🦢" }
+      { "id": 0, "name": "Regulator", "glyph": "=\n█\n=" },
+      { "id": 1, "name": "Bear", "glyph": "v\n█\nv" },
+      { "id": 2, "name": "Bull", "glyph": "^\n█\n^" },
+      { "id": 3, "name": "Black Swan", "glyph": "~\n█\n~" }
     ]
   },
   {
@@ -70,10 +70,10 @@
     "name": "FOMO",
     "glyph": "⟐\n█\n█\n█\n⟐",
     "minors": [
-      { "id": 0, "name": "BTFD", "glyph": "⇣\n█\n⇣" },
-      { "id": 1, "name": "Top Signal", "glyph": "⇡\n█\n⇡" },
-      { "id": 2, "name": "Market Price", "glyph": "⚡\n█\n⚡" },
-      { "id": 3, "name": "Conviction", "glyph": "💎\n█\n💎" }
+      { "id": 0, "name": "BTFD", "glyph": "v\n█\nv" },
+      { "id": 1, "name": "Top Signal", "glyph": "^\n█\n^" },
+      { "id": 2, "name": "Market Price", "glyph": "*\n█\n*" },
+      { "id": 3, "name": "Conviction", "glyph": "D\n█\nD" }
     ]
   },
   {
@@ -81,10 +81,10 @@
     "name": "FUD",
     "glyph": "☁\n☁\n█\n☁\n☁",
     "minors": [
-      { "id": 0, "name": "Shills", "glyph": "⚠\n█\n⚠" },
-      { "id": 1, "name": "PsyOps", "glyph": "🧠\n█\n🧠" },
-      { "id": 2, "name": "Rugs", "glyph": "🔥\n█\n🔥" },
-      { "id": 3, "name": "Scam", "glyph": "💀\n█\n💀" }
+      { "id": 0, "name": "Shills", "glyph": "!\n█\n!" },
+      { "id": 1, "name": "PsyOps", "glyph": "@\n█\n@" },
+      { "id": 2, "name": "Rugs", "glyph": "^\n█\n^" },
+      { "id": 3, "name": "Scam", "glyph": "X\n█\nX" }
     ]
   },
   {
@@ -92,10 +92,10 @@
     "name": "RNG",
     "glyph": "??\n??\n█\n??\n??",
     "minors": [
-      { "id": 0, "name": "Mints", "glyph": "🎲\n█\n🎲" },
-      { "id": 1, "name": "Order Routing", "glyph": "🔀\n█\n🔀" },
-      { "id": 2, "name": "Uptime", "glyph": "⏰\n█\n⏰" },
-      { "id": 3, "name": "Prediction", "glyph": "🔮\n█\n🔮" }
+      { "id": 0, "name": "Mints", "glyph": "[]\n█\n[]" },
+      { "id": 1, "name": "Order Routing", "glyph": "X\n█\nX" },
+      { "id": 2, "name": "Uptime", "glyph": "O\n█\nO" },
+      { "id": 3, "name": "Prediction", "glyph": "?\n█\n?" }
     ]
   },
   {
@@ -125,10 +125,10 @@
     "name": "Ego",
     "glyph": "⌂\n██\n███\n██\n⌂",
     "minors": [
-      { "id": 0, "name": "Touch Grass", "glyph": "🌱\n█\n🌱" },
+      { "id": 0, "name": "Touch Grass", "glyph": "^\n█\n^" },
       { "id": 1, "name": "\"Hyperliquid\"", "glyph": "HL\n█\nHL" },
-      { "id": 2, "name": "Family", "glyph": "👨‍👩‍👧‍👦\n█\n👨‍👩‍👧‍👦" },
-      { "id": 3, "name": "Needs", "glyph": "💸\n█\n💸" }
+      { "id": 2, "name": "Family", "glyph": "F\n█\nF" },
+      { "id": 3, "name": "Needs", "glyph": "$\n█\n$" }
     ]
   }
 ]

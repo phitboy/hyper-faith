@@ -103,7 +103,7 @@ export default function TokenDetail() {
     const major = majorsData[token.majorId];
     const minor = major?.minors[token.minorId];
     
-    const tweetText = `Check out this Omamori #${token.tokenId}! 🔮\n\n${token.materialTier} ${token.materialName} with ${token.punchCount}/25 punches\n\n${major?.name} → ${minor?.name}\n\nView on hyper.faith`;
+    const tweetText = `Check out this Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount}/25 punches\n\n${major?.name} → ${minor?.name}\n\nView on hyper.faith`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(tweetUrl, '_blank');
   };

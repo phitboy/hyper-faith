@@ -72,7 +72,7 @@ export default function Mint() {
   };
 
   const handleShare = (token: OmamoriToken) => {
-    const tweetText = `Just minted my Omamori #${token.tokenId}! 🔮\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
+    const tweetText = `Just minted my Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(tweetUrl, '_blank');
   };
