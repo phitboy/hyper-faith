@@ -86,8 +86,7 @@ export default function Mint() {
             Mint an Omamori
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Protective talismans for the modern trader. Choose your arcanum, 
-            offer your HYPE, and receive a unique NFT blessed by the ancient algorithms.
+            Ancient talismans for the modern trader. 100% of $HYPE offered is burned.
           </p>
         </div>
 
