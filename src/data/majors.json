@@ -29,7 +29,7 @@
       { "id": 0, "name": "Pump", "glyph": "↑\n█\n↑" },
       { "id": 1, "name": "Dump", "glyph": "↓\n█\n↓" },
       { "id": 2, "name": "Chop", "glyph": "∼\n█\n∼" },
-      { "id": 3, "name": "Formation", "glyph": "△\n█\n△" }
+      { "id": 3, "name": "Pattern", "glyph": "△\n█\n△" }
     ]
   },
   {
