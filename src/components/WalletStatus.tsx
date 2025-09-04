@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useOmamoriStore } from "@/store/omamoriStore";
 
 export function WalletStatus() {
@@ -20,44 +21,63 @@ export function WalletStatus() {
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col items-center gap-4 p-6 bg-card border border-border rounded">
-        <div className="text-center">
-          <h3 className="font-mono text-lg mb-2">Connect Wallet</h3>
-          <p className="text-muted-foreground text-sm">
-            Connect your wallet to mint Omamori
-          </p>
-        </div>
-        <Button 
-          onClick={handleConnect}
-          className="font-mono hover-lift focus-ring"
-        >
-          Connect Wallet
-        </Button>
-      </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button className="font-mono">
+            Connect Wallet
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 z-50" align="end">
+          <div className="flex flex-col items-center gap-4 p-2">
+            <div className="text-center">
+              <h3 className="font-mono text-lg mb-2">Connect Wallet</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                Connect your wallet to mint Omamori
+              </p>
+            </div>
+            <Button 
+              onClick={handleConnect}
+              className="font-mono w-full"
+            >
+              Connect Wallet
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
     );
   }
 
   return (
-    <div className="flex items-center justify-between p-4 bg-card border border-border rounded">
-      <div className="flex items-center gap-3">
-        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-        <div>
-          <div className="font-mono text-sm">
-            {address && truncateAddress(address)}
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="font-mono gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          {address && truncateAddress(address)}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 z-50" align="end">
+        <div className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+            <div>
+              <div className="font-mono text-sm">
+                {address && truncateAddress(address)}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Chain ID: {chainId || 'Unknown'}
+              </div>
+            </div>
           </div>
-          <div className="text-xs text-muted-foreground">
-            Chain ID: {chainId || 'Unknown'}
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDisconnect}
+            className="font-mono"
+          >
+            Disconnect
+          </Button>
         </div>
-      </div>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={handleDisconnect}
-        className="font-mono"
-      >
-        Disconnect
-      </Button>
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }
