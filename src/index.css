@@ -2,95 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* hyper.faith Design System - Ancient Internet Stone/Rune Aesthetic */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Core Brand Colors (HSL) */
+    --background: 0 0% 6%;           /* #0f0f0f - dark stone */
+    --foreground: 42 12% 89%;        /* #e6e1d5 - paper/parchment */
+    
+    --card: 0 0% 8%;                 /* slightly lighter than bg */
+    --card-foreground: 42 12% 89%;
+    
+    --popover: 0 0% 6%;
+    --popover-foreground: 42 12% 89%;
+    
+    --primary: 42 12% 89%;           /* paper color for primary */
+    --primary-foreground: 0 0% 6%;   /* dark text on light primary */
+    
+    --secondary: 38 5% 42%;          /* #6c6a65 - stone ink */
+    --secondary-foreground: 42 12% 89%;
+    
+    --muted: 0 0% 12%;               /* darker cards */
+    --muted-foreground: 38 5% 55%;   /* lighter stone ink */
+    
+    --accent: 38 5% 20%;             /* dark accent */
+    --accent-foreground: 42 12% 89%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 42 12% 89%;
+    
+    --border: 38 5% 25%;             /* subtle stone borders */
+    --input: 0 0% 12%;
+    --ring: 42 12% 89%;
+    
+    --radius: 0.25rem;               /* minimal rounding */
+    
+    /* Custom Stone/Rune Variables */
+    --stone-light: 38 8% 35%;        /* lighter stone */
+    --stone-medium: 38 5% 42%;       /* main stone ink */
+    --stone-dark: 38 5% 25%;         /* darker stone */
+    --parchment: 42 12% 89%;         /* main paper */
+    --parchment-dim: 42 8% 75%;      /* dimmed paper */
+    
+    /* Rarity Colors */
+    --common: 42 8% 75%;             /* wood/paper tones */
+    --uncommon: 200 15% 60%;         /* slate/stone blues */
+    --rare: 280 25% 65%;             /* crystal purples */
+    --ultra-rare: 45 80% 65%;        /* gold/amber */
+    --mythic: 25 90% 55%;            /* meteorite orange */
+    
+    /* Typography */
+    --font-ui: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
   }
-
+  
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Dark mode uses same values - this is already dark */
+    --background: 0 0% 6%;
+    --foreground: 42 12% 89%;
+    --card: 0 0% 8%;
+    --card-foreground: 42 12% 89%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 42 12% 89%;
+    --primary: 42 12% 89%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 38 5% 42%;
+    --secondary-foreground: 42 12% 89%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 38 5% 55%;
+    --accent: 38 5% 20%;
+    --accent-foreground: 42 12% 89%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 42 12% 89%;
+    --border: 38 5% 25%;
+    --input: 0 0% 12%;
+    --ring: 42 12% 89%;
   }
 }
 
@@ -98,8 +84,64 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-ui;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Stone texture noise via CSS */
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(var(--background)) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--stone-dark)) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, hsl(var(--background)) 0%, transparent 100%);
+    background-size: 300px 300px, 200px 200px, 100px 100px;
+    background-position: 0 0, 100px 100px, 50px 50px;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  
+  .font-ui {
+    font-family: var(--font-ui);
+  }
+  
+  /* Paper texture for cards */
+  .paper-texture {
+    background-image: 
+      radial-gradient(circle at 20% 80%, hsl(var(--parchment-dim)) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(var(--parchment)) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, hsl(var(--parchment-dim)) 0%, transparent 50%);
+    background-size: 150px 150px, 100px 100px, 75px 75px;
+  }
+  
+  /* Glyph rendering */
+  .glyph {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Subtle animations */
+  .hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(var(--background) / 0.3);
+  }
+  
+  /* Focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 }

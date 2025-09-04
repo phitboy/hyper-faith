@@ -52,16 +52,26 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				// Custom stone/rune colors
+				stone: {
+					light: 'hsl(var(--stone-light))',
+					DEFAULT: 'hsl(var(--stone-medium))',
+					dark: 'hsl(var(--stone-dark))'
+				},
+				parchment: {
+					DEFAULT: 'hsl(var(--parchment))',
+					dim: 'hsl(var(--parchment-dim))'
+				},
+				// Rarity tiers
+				common: 'hsl(var(--common))',
+				uncommon: 'hsl(var(--uncommon))',
+				rare: 'hsl(var(--rare))',
+				'ultra-rare': 'hsl(var(--ultra-rare))',
+				mythic: 'hsl(var(--mythic))'
+			},
+			fontFamily: {
+				ui: ['Inter', 'sans-serif'],
+				mono: ['JetBrains Mono', 'monospace'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

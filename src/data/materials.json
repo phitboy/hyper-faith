@@ -1,0 +1,203 @@
+{
+  "materials": [
+    {
+      "id": 0,
+      "name": "Wood",
+      "tier": "Common",
+      "weight": 300000000,
+      "color": "#8B4513",
+      "description": "Carved from ancient oak"
+    },
+    {
+      "id": 1,
+      "name": "Cloth",
+      "tier": "Common",
+      "weight": 100000000,
+      "color": "#DEB887",
+      "description": "Woven with care"
+    },
+    {
+      "id": 2,
+      "name": "Paper",
+      "tier": "Common",
+      "weight": 100000000,
+      "color": "#F5F5DC",
+      "description": "Handmade parchment"
+    },
+    {
+      "id": 3,
+      "name": "Clay",
+      "tier": "Common",
+      "weight": 50000000,
+      "color": "#A0522D",
+      "description": "Fired earth"
+    },
+    {
+      "id": 4,
+      "name": "Limestone",
+      "tier": "Common",
+      "weight": 50000000,
+      "color": "#F0E68C",
+      "description": "Soft stone"
+    },
+    {
+      "id": 5,
+      "name": "Slate",
+      "tier": "Uncommon",
+      "weight": 100000000,
+      "color": "#2F4F4F",
+      "description": "Dark tablet"
+    },
+    {
+      "id": 6,
+      "name": "Basalt",
+      "tier": "Uncommon",
+      "weight": 80000000,
+      "color": "#36454F",
+      "description": "Volcanic glass"
+    },
+    {
+      "id": 7,
+      "name": "Granite",
+      "tier": "Uncommon",
+      "weight": 80000000,
+      "color": "#C0C0C0",
+      "description": "Mountain heart"
+    },
+    {
+      "id": 8,
+      "name": "Marble",
+      "tier": "Uncommon",
+      "weight": 40000000,
+      "color": "#F8F8FF",
+      "description": "Polished perfection"
+    },
+    {
+      "id": 9,
+      "name": "Bronze",
+      "tier": "Uncommon",
+      "weight": 30000000,
+      "color": "#CD7F32",
+      "description": "Ancient alloy"
+    },
+    {
+      "id": 10,
+      "name": "Obsidian",
+      "tier": "Uncommon",
+      "weight": 20000000,
+      "color": "#0B0B0B",
+      "description": "Volcanic edge"
+    },
+    {
+      "id": 11,
+      "name": "Silver",
+      "tier": "Rare",
+      "weight": 15000000,
+      "color": "#C0C0C0",
+      "description": "Moon metal"
+    },
+    {
+      "id": 12,
+      "name": "Jade",
+      "tier": "Rare",
+      "weight": 10000000,
+      "color": "#00A86B",
+      "description": "Emperor's stone"
+    },
+    {
+      "id": 13,
+      "name": "Crystal",
+      "tier": "Rare",
+      "weight": 10000000,
+      "color": "#E0E0E0",
+      "description": "Pure clarity"
+    },
+    {
+      "id": 14,
+      "name": "Onyx",
+      "tier": "Rare",
+      "weight": 5000000,
+      "color": "#0F0F0F",
+      "description": "Black mirror"
+    },
+    {
+      "id": 15,
+      "name": "Amber",
+      "tier": "Rare",
+      "weight": 5000000,
+      "color": "#FFBF00",
+      "description": "Trapped time"
+    },
+    {
+      "id": 16,
+      "name": "Amethyst",
+      "tier": "Ultra Rare",
+      "weight": 2000000,
+      "color": "#9966CC",
+      "description": "Royal purple"
+    },
+    {
+      "id": 17,
+      "name": "Opal",
+      "tier": "Ultra Rare",
+      "weight": 1000000,
+      "color": "#FFFFFF",
+      "description": "Fire within"
+    },
+    {
+      "id": 18,
+      "name": "Emerald",
+      "tier": "Ultra Rare",
+      "weight": 800000,
+      "color": "#50C878",
+      "description": "Forest heart"
+    },
+    {
+      "id": 19,
+      "name": "Sapphire",
+      "tier": "Ultra Rare",
+      "weight": 600000,
+      "color": "#0F52BA",
+      "description": "Sky fragment"
+    },
+    {
+      "id": 20,
+      "name": "Ruby",
+      "tier": "Ultra Rare",
+      "weight": 400000,
+      "color": "#E0115F",
+      "description": "Blood drop"
+    },
+    {
+      "id": 21,
+      "name": "Lapis",
+      "tier": "Ultra Rare",
+      "weight": 199000,
+      "color": "#26619C",
+      "description": "Heaven's blue"
+    },
+    {
+      "id": 22,
+      "name": "Gold",
+      "tier": "Mythic",
+      "weight": 50,
+      "color": "#FFD700",
+      "description": "Sun's blessing"
+    },
+    {
+      "id": 23,
+      "name": "Meteorite",
+      "tier": "Mythic",
+      "weight": 50,
+      "color": "#4A4A4A",
+      "description": "Star fragment"
+    }
+  ],
+  "tierWeights": {
+    "Common": 600000000,
+    "Uncommon": 350000000,
+    "Rare": 45000000,
+    "Ultra Rare": 4999000,
+    "Mythic": 100
+  }
+}
