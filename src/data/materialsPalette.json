@@ -1,0 +1,28 @@
+{
+  "materials": [
+    { "id": 0, "name": "Wood", "tier": "Common", "bg": "#b78c55", "stroke": "#6b4e2e" },
+    { "id": 1, "name": "Cloth", "tier": "Common", "bg": "#d9cbb2", "stroke": "#7a6f60" },
+    { "id": 2, "name": "Paper", "tier": "Common", "bg": "#efe6d3", "stroke": "#8b8373" },
+    { "id": 3, "name": "Clay", "tier": "Common", "bg": "#b0643a", "stroke": "#6a3d26" },
+    { "id": 4, "name": "Limestone", "tier": "Common", "bg": "#cfc8b7", "stroke": "#6f6a5c" },
+    { "id": 5, "name": "Slate", "tier": "Uncommon", "bg": "#4b4f59", "stroke": "#b8bdc9" },
+    { "id": 6, "name": "Basalt", "tier": "Uncommon", "bg": "#3e3b3a", "stroke": "#b3ada9" },
+    { "id": 7, "name": "Granite", "tier": "Uncommon", "bg": "#8b8e95", "stroke": "#2e3138" },
+    { "id": 8, "name": "Marble", "tier": "Uncommon", "bg": "#e6e6ea", "stroke": "#6e6e78" },
+    { "id": 9, "name": "Bronze", "tier": "Uncommon", "bg": "#8c6e3d", "stroke": "#f1c277" },
+    { "id": 10, "name": "Obsidian", "tier": "Uncommon", "bg": "#111216", "stroke": "#8f8f99" },
+    { "id": 11, "name": "Silver", "tier": "Rare", "bg": "#c0c0c0", "stroke": "#5b5b5b" },
+    { "id": 12, "name": "Jade", "tier": "Rare", "bg": "#2f6e5b", "stroke": "#a7e0cc" },
+    { "id": 13, "name": "Crystal/Quartz", "tier": "Rare", "bg": "#e8f2ff", "stroke": "#7aa0c8" },
+    { "id": 14, "name": "Onyx", "tier": "Rare", "bg": "#1a1a1a", "stroke": "#9c9c9c" },
+    { "id": 15, "name": "Amber", "tier": "Rare", "bg": "#c37a3a", "stroke": "#ffd08a" },
+    { "id": 16, "name": "Amethyst", "tier": "Ultra Rare", "bg": "#5d3b8a", "stroke": "#c8b1ff" },
+    { "id": 17, "name": "Opal", "tier": "Ultra Rare", "bg": "#d9ecff", "stroke": "#9fd5ff" },
+    { "id": 18, "name": "Emerald", "tier": "Ultra Rare", "bg": "#1f7a44", "stroke": "#9af0bf" },
+    { "id": 19, "name": "Sapphire", "tier": "Ultra Rare", "bg": "#143a8a", "stroke": "#88b0ff" },
+    { "id": 20, "name": "Ruby", "tier": "Ultra Rare", "bg": "#8a1423", "stroke": "#ff98a6" },
+    { "id": 21, "name": "Lapis Lazuli", "tier": "Ultra Rare", "bg": "#1b3b8a", "stroke": "#c0d0ff" },
+    { "id": 22, "name": "Gold", "tier": "Mythic", "bg": "#d4af37", "stroke": "#5a4b10" },
+    { "id": 23, "name": "Meteorite", "tier": "Mythic", "bg": "#5a5752", "stroke": "#d7d3cc" }
+  ]
+}

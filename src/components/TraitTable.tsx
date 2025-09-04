@@ -22,11 +22,11 @@ export function TraitTable({ token, className = "" }: TraitTableProps) {
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'Common': return 'text-common';
-      case 'Uncommon': return 'text-uncommon';
-      case 'Rare': return 'text-rare';
-      case 'Ultra Rare': return 'text-ultra-rare';
-      case 'Mythic': return 'text-mythic';
+      case 'Common': return 'text-zinc-600';
+      case 'Uncommon': return 'text-blue-600';
+      case 'Rare': return 'text-purple-600';
+      case 'Ultra Rare': return 'text-amber-600';
+      case 'Mythic': return 'text-red-600';
       default: return 'text-muted-foreground';
     }
   };

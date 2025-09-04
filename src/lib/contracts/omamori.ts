@@ -27,7 +27,7 @@ let mockTokenId = 1;
 const mockTokens: OmamoriToken[] = [];
 
 /**
- * Mock mint function - simulates on-chain minting
+ * Mock mint function that returns tokenURI-style metadata
  */
 export async function mintOmamoriMock(args: MintArgs): Promise<OmamoriToken> {
   const { majorId, minorId, offeringHype } = args;
@@ -47,7 +47,7 @@ export async function mintOmamoriMock(args: MintArgs): Promise<OmamoriToken> {
   const material = pickMaterial(seed);
   const punchCount = getPunchCount(seed);
   
-  // Create token
+  // Create token with metadata attributes
   const token: OmamoriToken = {
     tokenId: mockTokenId++,
     majorId,
@@ -62,7 +62,7 @@ export async function mintOmamoriMock(args: MintArgs): Promise<OmamoriToken> {
     mintedAt: Date.now()
   };
   
-  // Generate SVG
+  // Generate SVG using on-chain palette
   token.imageSvg = renderOmamoriSVG(token);
   
   // Store mock token

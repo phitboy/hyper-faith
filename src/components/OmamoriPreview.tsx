@@ -105,15 +105,15 @@ export function OmamoriPreview({ className = "", seed: fixedSeed }: OmamoriPrevi
 function getTierColor(tier: string): string {
   switch (tier) {
     case 'Common':
-      return 'text-common';
-    case 'Uncommon':
-      return 'text-uncommon';
+      return 'text-zinc-600';
+    case 'Uncommon': 
+      return 'text-blue-600';
     case 'Rare':
-      return 'text-rare';
+      return 'text-purple-600';
     case 'Ultra Rare':
-      return 'text-ultra-rare';
+      return 'text-amber-600';
     case 'Mythic':
-      return 'text-mythic';
+      return 'text-red-600';
     default:
       return 'text-muted-foreground';
   }

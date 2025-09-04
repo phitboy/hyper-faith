@@ -1,4 +1,5 @@
-import { materials } from '../../data/materials.json';
+import materialsData from '@/data/materials.json';
+import materialsPalette from '@/data/materialsPalette.json';
 
 /**
  * Deterministic material picker using seed-based random generation
@@ -17,21 +18,23 @@ export function pickMaterial(seed: string) {
   // Use absolute value and modulo to get positive number
   const random = Math.abs(hash) / 2147483648; // Normalize to 0-1
   
-  // Calculate total weight
-  const totalWeight = materials.reduce((sum, material) => sum + material.weight, 0);
+  // Calculate total weight from original materials data
+  const totalWeight = materialsData.materials.reduce((sum, material) => sum + material.weight, 0);
   
   // Pick based on weighted random
   let weightedRandom = random * totalWeight;
   
-  for (const material of materials) {
+  for (const material of materialsData.materials) {
     weightedRandom -= material.weight;
     if (weightedRandom <= 0) {
-      return material;
+      // Return the palette version with colors
+      const paletteVersion = materialsPalette.materials.find(p => p.id === material.id);
+      return paletteVersion || materialsPalette.materials[2]; // fallback to paper
     }
   }
   
-  // Fallback to first material (should never happen)
-  return materials[0];
+  // Fallback to paper if somehow we don't hit any
+  return materialsPalette.materials[2];
 }
 
 /**
