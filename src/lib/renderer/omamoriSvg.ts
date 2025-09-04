@@ -170,14 +170,14 @@ function renderMinorGlyph(majorId: number, minorId: number, color: string): stri
     } else { // Sideline: missing right edge
       s = S.line(730, 1020, 870, 1020, 6) + S.line(730, 1020, 730, 1160, 6) + S.line(730, 1160, 870, 1160, 6);
     }
-  } else if (majorId === 6) { // FOMO: BTFD, Top Signal, Market Price, Diamond Hands
+  } else if (majorId === 6) { // FOMO: BTFD, Top Signal, Market Price, Conviction
     if (minorId === 0) { // BTFD: small inverted wedge at base
       s = S.polygon(triUp(800, 1080, 80), 6, false) + S.polygon(triDown(800, 1160, 26), 6, false);
     } else if (minorId === 1) { // Top Signal: dot at apex
       s = S.polygon(triUp(800, 1080, 80), 6, false) + S.circle(800, 1000, 6, true);
     } else if (minorId === 2) { // Market Price: midline
       s = S.polygon(triUp(800, 1080, 80), 6, false) + S.line(760, 1115, 840, 1115, 6);
-    } else { // Diamond Hands: double outline
+    } else { // Conviction: double outline
       s = S.polygon(triUp(800, 1080, 80), 6, false) + S.polygon(triUp(800, 1080, 66), 6, false);
     }
   } else if (majorId === 7) { // FUD: Shills, PsyOps, Rugs, Scam

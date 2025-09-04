@@ -73,7 +73,7 @@
       { "id": 0, "name": "BTFD", "glyph": "⇣\n█\n⇣" },
       { "id": 1, "name": "Top Signal", "glyph": "⇡\n█\n⇡" },
       { "id": 2, "name": "Market Price", "glyph": "⚡\n█\n⚡" },
-      { "id": 3, "name": "Diamond Hands", "glyph": "💎\n█\n💎" }
+      { "id": 3, "name": "Conviction", "glyph": "💎\n█\n💎" }
     ]
   },
   {
