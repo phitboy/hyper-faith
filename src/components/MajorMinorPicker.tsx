@@ -60,7 +60,7 @@ export function MajorMinorPicker() {
       {currentMajor && (
         <div>
           <h3 className="font-mono text-lg mb-4">
-            Choose Minor: {currentMajor.name}
+            Choose Aspect: {currentMajor.name}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {currentMajor.minors.map((minor) => (
