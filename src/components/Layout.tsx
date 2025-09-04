@@ -37,7 +37,7 @@ export function Layout({
               <div>
                 <div className="font-mono text-lg font-bold">hyper.faith</div>
                 <div className="text-xs text-muted-foreground -mt-1">
-                  The first church was a market
+                  no one is atheist at 100x leverage
                 </div>
               </div>
             </Link>
