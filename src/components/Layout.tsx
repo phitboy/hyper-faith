@@ -37,7 +37,7 @@ export function Layout({
               <div>
                 <div className="font-mono text-lg font-bold">hyper.faith</div>
                 <div className="text-xs text-muted-foreground -mt-1">
-                  mint your omamori; pray for your fills
+                  The first church was a market
                 </div>
               </div>
             </Link>
