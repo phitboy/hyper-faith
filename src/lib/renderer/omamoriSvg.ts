@@ -263,34 +263,149 @@ export function renderOmamoriSVG(token: TokenData): string {
   
   // Color scheme based on material tier - removed as colors come from palette now
   
-  // Generate punch positions (25 slots in diamond pattern)
-  const generatePunchSlots = () => {
-    const slots = [];
-    const rows = [1, 2, 3, 4, 5, 4, 3, 2, 1]; // Diamond pattern
-    let slotIndex = 0;
-    
-    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      const slotsInRow = rows[rowIndex];
-      const startX = 500 - (slotsInRow * 15) / 2; // Center the row
-      const y = 400 + rowIndex * 30 - 120; // Center vertically around 400
-      
-      for (let slotInRow = 0; slotInRow < slotsInRow; slotInRow++) {
-        const x = startX + slotInRow * 30;
-        
-        // Add slight jitter based on seed
-        const jitterX = (hashCode(seed + slotIndex) % 6) - 3;
-        const jitterY = (hashCode(seed + slotIndex + 'y') % 6) - 3;
-        const rotation = (hashCode(seed + slotIndex + 'rot') % 20) - 10;
-        
-        slots.push({
-          x: x + jitterX,
-          y: y + jitterY,
-          rotation,
-          filled: slotIndex < punchCount
-        });
-        
-        slotIndex++;
+  // Punch Layout System - mirrors Solidity specification exactly
+  
+  // Canonical diamond centers (25 slots) - base positions before transform
+  const baseSlots = (): [number[], number[]] => {
+    const xs = [500,460,540,420,500,580,380,460,540,620,340,420,500,580,660,380,460,540,620,420,500,580,460,540,500];
+    const ys = [420,470,470,520,520,520,570,570,570,570,620,620,620,620,620,670,670,670,670,720,720,720,770,770,820];
+    return [xs, ys];
+  };
+
+  // Tablet interior bounds (keep within slab & away from frame)
+  const tabletBounds = () => {
+    // our slab rect was x=100..900, y=150..1250
+    // keep a little margin for aesthetics:
+    return { xMin: 140, yMin: 190, xMax: 860, yMax: 1210 };
+  };
+
+  // Forbidden glyph boxes (approximate):
+  // top-left Major box & bottom-right Minor box
+  const majorBox = () => {
+    // around ~ (220..380, 320..600)
+    return { x1: 200, y1: 320, x2: 390, y2: 600 };
+  };
+  
+  const minorBox = () => {
+    // around ~ (700..860, 980..1180)
+    return { x1: 690, y1: 970, x2: 870, y2: 1190 };
+  };
+
+  // Simple AABB overlap
+  const overlap = (ax1: number, ay1: number, ax2: number, ay2: number, 
+                   bx1: number, by1: number, bx2: number, by2: number): boolean => {
+    return !(ax2 < bx1 || bx2 < ax1 || ay2 < by1 || by2 < ay1);
+  };
+
+  // Fixed-point angles (degrees) with cos/sin scaled by 1e4 to avoid heavy trig
+  const angleTable = () => {
+    // {-12,-8,-4,0,4,8,12} degrees
+    const deg    = [-12, -8, -4, 0, 4, 8, 12];
+    const cos1e4 = [ 9781, 9903, 9976, 10000, 9976, 9903, 9781];
+    const sin1e4 = [-2079, -1392,  -698,     0,   698,  1392, 2079];
+    return { deg, cos1e4, sin1e4 };
+  };
+
+  // Deterministic small translation (±18 px) from seed+nonce
+  const jitterXY = (seed: string, nonce: number): [number, number] => {
+    const hash1 = hashCode(seed + nonce + 0xF17E);
+    const hash2 = hashCode(seed + nonce + 0x1234);
+    const rx = ((hash1 % 256) - 128); // -127..127
+    const ry = ((hash2 % 256) - 128);
+    const dx = rx % 19;              // -18..18
+    const dy = ry % 19;
+    return [dx, dy];
+  };
+
+  // Produce transformed slots that don't overlap forbidden boxes
+  const transformSlots = (seed: string, punchCount: number): [number[], number[]] => {
+    const [bx, by] = baseSlots();
+    const bounds = tabletBounds();
+    const majorBbox = majorBox();
+    const minorBbox = minorBox();
+    const angles = angleTable();
+
+    // try up to 10 candidate transforms (angleIndex, dx, dy), deterministic order
+    for (let k = 0; k < 10; k++) {
+      const idx = Math.abs(hashCode(seed + k)) % 7; // pick angle
+      const [dx, dy] = jitterXY(seed, k + 33);
+
+      // pivot around the diamond center (500, 620 is the mid row 5 center)
+      const cx = 500; 
+      const cy = 620;
+      const cosA = angles.cos1e4[idx]; 
+      const sinA = angles.sin1e4[idx]; // scaled by 1e4
+
+      let ok = true;
+      for (let i = 0; i < punchCount && i < 25; i++) {
+        const x0 = bx[i]; 
+        const y0 = by[i];
+        // rotate around (cx,cy)
+        const xr = cx + Math.floor(( (x0 - cx) * cosA - (y0 - cy) * sinA ) / 10000);
+        const yr = cy + Math.floor(( (x0 - cx) * sinA + (y0 - cy) * cosA ) / 10000);
+        // translate
+        const xt = xr + dx;
+        const yt = yr + dy;
+
+        // punch rect is 12x12; build its AABB (matching SVG rect size)
+        const halfW = 6; 
+        const halfH = 6;
+        const ax1 = xt - halfW; 
+        const ay1 = yt - halfH;
+        const ax2 = xt + halfW; 
+        const ay2 = yt + halfH;
+
+        // bounds check
+        if (ax1 < bounds.xMin || ay1 < bounds.yMin || ax2 > bounds.xMax || ay2 > bounds.yMax) { 
+          ok = false; 
+          break; 
+        }
+        // overlap forbidden glyph areas?
+        if (overlap(ax1,ay1,ax2,ay2, majorBbox.x1,majorBbox.y1,majorBbox.x2,majorBbox.y2)) { 
+          ok = false; 
+          break; 
+        }
+        if (overlap(ax1,ay1,ax2,ay2, minorBbox.x1,minorBbox.y1,minorBbox.x2,minorBbox.y2)) { 
+          ok = false; 
+          break; 
+        }
       }
+
+      if (ok) {
+        // write transformed coords (even for unused slots so array is full)
+        const outX: number[] = [];
+        const outY: number[] = [];
+        for (let i = 0; i < 25; i++) {
+          const x0 = bx[i]; 
+          const y0 = by[i];
+          const xr = cx + Math.floor(( (x0 - cx) * cosA - (y0 - cy) * sinA ) / 10000);
+          const yr = cy + Math.floor(( (x0 - cx) * sinA + (y0 - cy) * cosA ) / 10000);
+          outX[i] = xr + dx;
+          outY[i] = yr + dy;
+        }
+        return [outX, outY];
+      }
+    }
+
+    // Fallback: untransformed (still OK—by design the base diamond avoids the boxes)
+    return [bx.slice(), by.slice()];
+  };
+
+  // Generate punch slots with deterministic transform
+  const generatePunchSlots = () => {
+    const [transformedX, transformedY] = transformSlots(seed, punchCount);
+    
+    const slots = [];
+    for (let i = 0; i < 25; i++) {
+      // Add small individual rotation for visual interest (but keep positions deterministic)
+      const rotation = (hashCode(seed + i + 'rot') % 20) - 10;
+      
+      slots.push({
+        x: transformedX[i],
+        y: transformedY[i],
+        rotation,
+        filled: i < punchCount
+      });
     }
     
     return slots;
