@@ -263,40 +263,126 @@ export function renderOmamoriSVG(token: TokenData): string {
   
   // Color scheme based on material tier - removed as colors come from palette now
   
-  // Generate punch positions (25 slots in diamond pattern)
-  const generatePunchSlots = () => {
-    const slots = [];
-    const rows = [1, 2, 3, 4, 5, 4, 3, 2, 1]; // Diamond pattern
-    let slotIndex = 0;
-    
-    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      const slotsInRow = rows[rowIndex];
-      const startX = 500 - (slotsInRow * 15) / 2; // Center the row
-      const y = 400 + rowIndex * 30 - 120; // Center vertically around 400
-      
-      for (let slotInRow = 0; slotInRow < slotsInRow; slotInRow++) {
-        const x = startX + slotInRow * 30;
-        
-        // Add slight jitter based on seed
-        const jitterX = (hashCode(seed + slotIndex) % 6) - 3;
-        const jitterY = (hashCode(seed + slotIndex + 'y') % 6) - 3;
-        const rotation = (hashCode(seed + slotIndex + 'rot') % 20) - 10;
-        
-        slots.push({
-          x: x + jitterX,
-          y: y + jitterY,
-          rotation,
-          filled: slotIndex < punchCount
-        });
-        
-        slotIndex++;
-      }
+// Punch Layout System (mirrors Solidity implementation)
+  class PunchLayout {
+    // Canonical diamond centers (25 slots)
+    static baseSlots(): { xs: number[], ys: number[] } {
+      const xs = [500,460,540,420,500,580,380,460,540,620,340,420,500,580,660,380,460,540,620,420,500,580,460,540,500];
+      const ys = [420,470,470,520,520,520,570,570,570,570,620,620,620,620,620,670,670,670,670,720,720,720,770,770,820];
+      return { xs, ys };
     }
-    
-    return slots;
-  };
+
+    // Tablet interior bounds (keep within slab & away from frame)
+    static tabletBounds(): { xMin: number, yMin: number, xMax: number, yMax: number } {
+      return { xMin: 140, yMin: 190, xMax: 860, yMax: 1210 };
+    }
+
+    // Forbidden glyph boxes
+    static majorBox(): { x1: number, y1: number, x2: number, y2: number } {
+      return { x1: 200, y1: 320, x2: 390, y2: 600 };
+    }
+
+    static minorBox(): { x1: number, y1: number, x2: number, y2: number } {
+      return { x1: 690, y1: 970, x2: 870, y2: 1190 };
+    }
+
+    // Simple AABB overlap check
+    static overlap(ax1: number, ay1: number, ax2: number, ay2: number, 
+                   bx1: number, by1: number, bx2: number, by2: number): boolean {
+      return !(ax2 < bx1 || bx2 < ax1 || ay2 < by1 || by2 < ay1);
+    }
+
+    // Fixed-point angles (degrees) with cos/sin scaled by 1e4
+    static angleTable(): { degrees: number[], cos1e4: number[], sin1e4: number[] } {
+      return {
+        degrees: [-12, -8, -4, 0, 4, 8, 12],
+        cos1e4:  [9781, 9903, 9976, 10000, 9976, 9903, 9781],
+        sin1e4:  [-2079, -1392, -698, 0, 698, 1392, 2079]
+      };
+    }
+
+    // Deterministic small translation (±18 px) from seed+nonce
+    static jitterXY(seed: string, nonce: number): { dx: number, dy: number } {
+      const hash = hashCode(seed + nonce + 'F17E');
+      const rx = ((hash & 0xFF) - 128) % 19; // -18..18
+      const ry = (((hash >> 8) & 0xFF) - 128) % 19;
+      return { dx: rx, dy: ry };
+    }
+
+    // Produce transformed slots that don't overlap forbidden boxes
+    static transformSlots(seed: string, punchCount: number): { xs: number[], ys: number[] } {
+      const { xs: bx, ys: by } = this.baseSlots();
+      const { xMin, yMin, xMax, yMax } = this.tabletBounds();
+      const { x1: mx1, y1: my1, x2: mx2, y2: my2 } = this.majorBox();
+      const { x1: nx1, y1: ny1, x2: nx2, y2: ny2 } = this.minorBox();
+      const { cos1e4: c, sin1e4: s } = this.angleTable();
+
+      // Try up to 10 candidate transforms, deterministic order
+      for (let k = 0; k < 10; k++) {
+        const idx = Math.abs(hashCode(seed + k)) % 7; // pick angle
+        const { dx, dy } = this.jitterXY(seed, k + 33);
+
+        // Pivot around diamond center (500, 620)
+        const cx = 500, cy = 620;
+        const cosA = c[idx], sinA = s[idx]; // scaled by 1e4
+
+        let ok = true;
+        const transformedXs: number[] = [];
+        const transformedYs: number[] = [];
+
+        // Test all punch positions for this transform
+        for (let i = 0; i < Math.min(punchCount, 25); i++) {
+          const x0 = bx[i], y0 = by[i];
+          
+          // Rotate around (cx, cy)
+          const xr = cx + Math.floor(((x0 - cx) * cosA - (y0 - cy) * sinA) / 10000);
+          const yr = cy + Math.floor(((x0 - cx) * sinA + (y0 - cy) * cosA) / 10000);
+          
+          // Translate
+          const xt = xr + dx;
+          const yt = yr + dy;
+
+          // Punch rect is 40x90; build its AABB
+          const halfW = 20, halfH = 45;
+          const ax1 = xt - halfW, ay1 = yt - halfH;
+          const ax2 = xt + halfW, ay2 = yt + halfH;
+
+          // Bounds check
+          if (ax1 < xMin || ay1 < yMin || ax2 > xMax || ay2 > yMax) {
+            ok = false;
+            break;
+          }
+
+          // Overlap forbidden glyph areas?
+          if (this.overlap(ax1, ay1, ax2, ay2, mx1, my1, mx2, my2) ||
+              this.overlap(ax1, ay1, ax2, ay2, nx1, ny1, nx2, ny2)) {
+            ok = false;
+            break;
+          }
+        }
+
+        if (ok) {
+          // Apply transform to all 25 slots
+          for (let i = 0; i < 25; i++) {
+            const x0 = bx[i], y0 = by[i];
+            const xr = cx + Math.floor(((x0 - cx) * cosA - (y0 - cy) * sinA) / 10000);
+            const yr = cy + Math.floor(((x0 - cx) * sinA + (y0 - cy) * cosA) / 10000);
+            transformedXs[i] = xr + dx;
+            transformedYs[i] = yr + dy;
+          }
+          return { xs: transformedXs, ys: transformedYs };
+        }
+      }
+
+      // Fallback: untransformed base diamond
+      return { xs: [...bx], ys: [...by] };
+    }
+  }
+
+  // Generate punch slots using the new wandering system
+  const { xs: punchXs, ys: punchYs } = PunchLayout.transformSlots(seed, punchCount);
   
-  const punchSlots = generatePunchSlots();
+  
   
   // Render glyphs with material colors
   const majorGlyph = renderMajorGlyph(majorId, material.stroke);
@@ -316,15 +402,12 @@ export function renderOmamoriSVG(token: TokenData): string {
       ${minorGlyph}
     </g>
     
-    <!-- Punch diamond -->
-    <g transform="translate(500, 700)">
-      ${punchSlots.map((slot, index) => `
-        <rect x="${slot.x - 500}" y="${slot.y - 700}" width="12" height="12"
-              fill="${slot.filled ? material.stroke : 'none'}"
-              stroke="${material.stroke}"
-              stroke-width="1"
-              transform="rotate(${slot.rotation} ${slot.x - 500 + 6} ${slot.y - 700 + 6})"
-              opacity="${slot.filled ? 0.8 : 0.3}"/>
+    <!-- Punch cluster (wandering diamond) -->
+    <g stroke="${material.stroke}" stroke-width="6">
+      ${Array.from({ length: Math.min(punchCount, 25) }, (_, i) => `
+        <rect x="${punchXs[i] - 20}" y="${punchYs[i] - 45}" 
+              width="40" height="90" rx="4" ry="4" 
+              fill="none"/>
       `).join('')}
     </g>
     
