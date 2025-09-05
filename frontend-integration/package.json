@@ -1,0 +1,39 @@
+{
+  "name": "@hyper-faith/contracts",
+  "version": "1.0.0",
+  "description": "Contract ABIs and utilities for Hyper Faith Omamori NFT integration",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "abis/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "generate": "wagmi generate",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "ethereum",
+    "nft",
+    "hyperliquid",
+    "omamori",
+    "wagmi"
+  ],
+  "author": "Hyper Faith Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@wagmi/cli": "^2.1.15",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0"
+  }
+}

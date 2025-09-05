@@ -1,0 +1,101 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_materials",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "SVG_HEIGHT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SVG_WIDTH",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "materials",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IMaterials"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "tokenURIView",
+    "inputs": [
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "majorId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "minorId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "materialId",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "punchCount",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "seed",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "hypeBurned",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

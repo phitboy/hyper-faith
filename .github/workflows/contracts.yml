@@ -1,0 +1,75 @@
+name: Smart Contracts CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: 
+      - 'contracts/**'
+      - 'interfaces/**'
+      - 'libraries/**'
+      - 'test/**'
+      - 'scripts/**'
+      - 'foundry.toml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'contracts/**'
+      - 'interfaces/**' 
+      - 'libraries/**'
+      - 'test/**'
+      - 'scripts/**'
+      - 'foundry.toml'
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Foundry project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv --gas-report
+        id: test
+
+      - name: Run Solhint linter
+        run: |
+          npm install -g solhint
+          solhint 'contracts/**/*.sol' 'interfaces/**/*.sol' 'libraries/**/*.sol'
+        id: lint
+
+      - name: Run Slither static analysis
+        uses: crytic/slither-action@v0.3.0
+        id: slither
+        with:
+          target: 'contracts/'
+          slither-config: 'slither.config.json'
+          fail-on: none
+        continue-on-error: true
+
+      - name: Generate gas report
+        run: |
+          forge test --gas-report > gas-report.txt
+          echo "## Gas Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat gas-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

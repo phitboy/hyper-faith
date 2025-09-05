@@ -1,0 +1,159 @@
+{
+  "name": "hyper-faith-devtools",
+  "version": "0.1.0",
+  "description": "Development tools for Hyper Faith Omamori NFT contracts",
+  "tools": [
+    {
+      "name": "exec.anvil",
+      "description": "Run local Ethereum node with Anvil",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "number",
+            "description": "Port to run Anvil on",
+            "default": 8545
+          },
+          "chain_id": {
+            "type": "number", 
+            "description": "Chain ID for local network",
+            "default": 31337
+          }
+        }
+      }
+    },
+    {
+      "name": "exec.forgeBuild",
+      "description": "Compile Solidity contracts with Forge",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "watch": {
+            "type": "boolean",
+            "description": "Watch for file changes",
+            "default": false
+          }
+        }
+      }
+    },
+    {
+      "name": "exec.forgeTest",
+      "description": "Run contract tests with detailed output",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "verbosity": {
+            "type": "string",
+            "enum": ["-v", "-vv", "-vvv", "-vvvv"],
+            "description": "Test output verbosity level",
+            "default": "-vv"
+          },
+          "match_test": {
+            "type": "string",
+            "description": "Run tests matching pattern"
+          },
+          "match_contract": {
+            "type": "string", 
+            "description": "Run tests in contracts matching pattern"
+          }
+        }
+      }
+    },
+    {
+      "name": "exec.forgeGas",
+      "description": "Run tests with gas usage reports",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "exec.deploy",
+      "description": "Deploy contracts using Forge script",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": ["local", "hyperliquid"],
+            "description": "Target network for deployment",
+            "default": "local"
+          },
+          "broadcast": {
+            "type": "boolean",
+            "description": "Actually broadcast transactions",
+            "default": false
+          },
+          "verify": {
+            "type": "boolean",
+            "description": "Verify contracts on block explorer",
+            "default": false
+          }
+        }
+      }
+    },
+    {
+      "name": "exec.slither",
+      "description": "Run Slither static analysis on contracts",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Specific contract file to analyze",
+            "default": "contracts/"
+          }
+        }
+      }
+    },
+    {
+      "name": "exec.solhint",
+      "description": "Run Solhint linter on contracts",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "exec.generateAbis",
+      "description": "Generate ABIs and copy to frontend directory",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "exec.extractABIs",
+      "description": "Extract ABIs using shell script",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "exec.deployLocal",
+      "description": "Deploy contracts to local Anvil node",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "exec.deployMainnet",
+      "description": "Deploy contracts to HyperEVM mainnet",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "hype_token": {
+            "type": "string",
+            "description": "HYPE token contract address"
+          },
+          "initial_owner": {
+            "type": "string", 
+            "description": "Initial owner address for NFT contract"
+          }
+        }
+      }
+    }
+  ]
+}

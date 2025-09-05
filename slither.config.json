@@ -1,0 +1,24 @@
+{
+  "filter_paths": [
+    "lib/",
+    "out/",
+    "cache/"
+  ],
+  "exclude_informational": false,
+  "exclude_low": false,
+  "exclude_medium": false,
+  "exclude_high": false,
+  "exclude_optimization": false,
+  "disable_detectors": [
+    "pragma",
+    "solc-version",
+    "low-level-calls"
+  ],
+  "compilation_unit_paths": [
+    "contracts/"
+  ],
+  "solc_remaps": [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@forge-std/=lib/forge-std/src/"
+  ]
+}
