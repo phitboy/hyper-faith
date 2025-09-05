@@ -77,9 +77,7 @@ export default function Mint() {
           <h1 className="font-mono text-4xl md:text-6xl font-bold">
             Hyperliquid Omamori
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ancient talismans for the modern trader. 100% of $HYPE offered is burned.
-          </p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Ancient talismans for the modern trader. 100% of $HYPE offered is sent to the assistance fund</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
