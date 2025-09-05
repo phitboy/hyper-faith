@@ -84,7 +84,7 @@ export function Layout({
               <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                 Discord
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="https://github.com/phitboy/hyper-faith" className="text-muted-foreground hover:text-foreground transition-colors">
                 GitHub
               </a>
             </div>
