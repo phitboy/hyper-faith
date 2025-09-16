@@ -22,6 +22,8 @@ export default defineConfig(({ mode }) => ({
   define: {
     // Fix for browser compatibility
     global: 'globalThis',
+    // Fix process reference issues
+    'process.env': 'import.meta.env',
   },
   optimizeDeps: {
     include: ['wagmi', 'viem', '@rainbow-me/rainbowkit'],

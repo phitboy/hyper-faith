@@ -33,7 +33,7 @@ export function useMintGasEstimation(hypeAmount: string) {
   
   // Calculate total cost
   const totalCost = useQuery({
-    queryKey: ['totalMintCost', gasEstimate, gasPrice, hypeAmount],
+    queryKey: ['totalMintCost', gasEstimate?.toString(), gasPrice?.toString(), hypeAmount],
     queryFn: () => {
       if (!gasEstimate || !gasPrice || !hypeAmount) return null
       
@@ -119,7 +119,7 @@ export function useTransactionCostBreakdown(hypeAmount: string) {
   const { totalCost, isLoading } = useMintGasEstimation(hypeAmount)
   
   return useQuery({
-    queryKey: ['costBreakdown', totalCost],
+    queryKey: ['costBreakdown', totalCost?.totalHype],
     queryFn: () => {
       if (!totalCost) return null
       
