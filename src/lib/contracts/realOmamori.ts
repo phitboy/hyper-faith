@@ -3,11 +3,20 @@ import type { OmamoriToken } from './omamori'
 
 /**
  * Parse tokenURI response from contract into OmamoriToken
+ * Updated to handle OmamoriNFTSingle contract format
  */
 export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
   try {
     // TokenURI format: "data:application/json;base64,{base64_encoded_json}"
+    if (!tokenURI || !tokenURI.includes(',')) {
+      throw new Error('Invalid tokenURI format')
+    }
+    
     const base64Json = tokenURI.split(',')[1]
+    if (!base64Json) {
+      throw new Error('No base64 data found in tokenURI')
+    }
+    
     const jsonString = atob(base64Json)
     const metadata = JSON.parse(jsonString)
     
@@ -19,26 +28,45 @@ export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
     }
     
     // Parse image (SVG is base64 encoded)
-    const imageSvg = metadata.image?.startsWith('data:image/svg+xml;base64,') 
-      ? atob(metadata.image.split(',')[1])
-      : metadata.image || ''
+    let imageSvg = ''
+    if (metadata.image?.startsWith('data:image/svg+xml;base64,')) {
+      try {
+        imageSvg = atob(metadata.image.split(',')[1])
+      } catch (error) {
+        console.warn('Failed to decode SVG image:', error)
+        imageSvg = metadata.image || ''
+      }
+    } else {
+      imageSvg = metadata.image || ''
+    }
+    
+    // Handle OmamoriNFTSingle format (missing Major ID, Minor ID, Punches, Seed)
+    // These will be filled by getTokenData() in tokenQueries.ts
+    const hypeBurnedValue = getAttributeValue('HYPE Burned')
+    const hypeBurnedFormatted = hypeBurnedValue ? 
+      (typeof hypeBurnedValue === 'number' ? 
+        formatEther(BigInt(hypeBurnedValue)) : 
+        hypeBurnedValue.toString()) : '0'
     
     return {
       tokenId,
-      majorId: parseInt(getAttributeValue('Major ID')) || 0,
-      minorId: parseInt(getAttributeValue('Minor ID')) || 0,
+      majorId: parseInt(getAttributeValue('Major ID')) || 0, // Will be updated from getTokenData
+      minorId: parseInt(getAttributeValue('Minor ID')) || 0, // Will be updated from getTokenData
       materialId: 0, // Will be filled from getTokenData
       materialName: getAttributeValue('Material') || 'Unknown',
       materialTier: getAttributeValue('Rarity') || 'Common',
-      punchCount: parseInt(getAttributeValue('Punches')) || 0,
-      hypeBurned: getAttributeValue('HYPE Burned') || '0',
-      seed: getAttributeValue('Seed') || '0x0',
+      punchCount: parseInt(getAttributeValue('Punches')) || 0, // Will be updated from getTokenData
+      hypeBurned: hypeBurnedFormatted,
+      seed: getAttributeValue('Seed') || '0x0', // Will be updated from getTokenData
       imageSvg,
       mintedAt: Date.now(), // Approximate, could be improved with block timestamp
     } as OmamoriToken
   } catch (error) {
-    console.error('Failed to parse tokenURI:', error)
-    throw new Error(`Failed to parse token ${tokenId} metadata`)
+    console.error('Failed to parse tokenURI:', error, {
+      tokenId,
+      tokenURI: tokenURI?.substring(0, 100) + '...' // Log first 100 chars for debugging
+    })
+    throw new Error(`Failed to parse token ${tokenId} metadata: ${error.message}`)
   }
 }
 

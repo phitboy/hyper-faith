@@ -47,6 +47,29 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
         
           if (tokenURI) {
             const token = parseTokenURI(Number(tokenId), tokenURI as string)
+            
+            // Get additional token data from getTokenData() for OmamoriNFTSingle
+            try {
+              const tokenData = await readContract(config, {
+                address: contractAddresses.OmamoriNFTSingle,
+                abi: OmamoriNFTSingleABI,
+                functionName: 'getTokenData',
+                args: [BigInt(tokenId)],
+              } as any)
+              
+              if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
+                // Update token with data from getTokenData
+                token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
+                token.materialId = Number(tokenData[1]) // materialId (uint16)
+                token.majorId = Number(tokenData[2]) // majorId (uint8)
+                token.minorId = Number(tokenData[3]) // minorId (uint8)
+                token.punchCount = Number(tokenData[4]) // punchCount (uint8)
+                // hypeBurned already handled in parseTokenURI
+              }
+            } catch (error) {
+              console.warn(`Failed to get token data for token ${tokenId}:`, error)
+            }
+            
             tokens.push(token)
           }
         }
@@ -85,10 +108,33 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
         
-        if (tokenURI) {
-          const token = parseTokenURI(tokenId, tokenURI as string)
-          tokens.push(token)
-        }
+               if (tokenURI) {
+                 const token = parseTokenURI(tokenId, tokenURI as string)
+                 
+                 // Get additional token data from getTokenData() for OmamoriNFTSingle
+                 try {
+                   const tokenData = await readContract(config, {
+                     address: contractAddresses.OmamoriNFTSingle,
+                     abi: OmamoriNFTSingleABI,
+                     functionName: 'getTokenData',
+                     args: [BigInt(tokenId)],
+                   } as any)
+                   
+                   if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
+                     // Update token with data from getTokenData
+                     token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
+                     token.materialId = Number(tokenData[1]) // materialId (uint16)
+                     token.majorId = Number(tokenData[2]) // majorId (uint8)
+                     token.minorId = Number(tokenData[3]) // minorId (uint8)
+                     token.punchCount = Number(tokenData[4]) // punchCount (uint8)
+                     // hypeBurned already handled in parseTokenURI
+                   }
+                 } catch (error) {
+                   console.warn(`Failed to get token data for token ${tokenId}:`, error)
+                 }
+                 
+                 tokens.push(token)
+               }
       } catch (error) {
         // Token doesn't exist, continue
         continue
@@ -120,7 +166,31 @@ export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | nu
       return null
     }
     
-    return parseTokenURI(tokenId, tokenURI as string)
+    const token = parseTokenURI(tokenId, tokenURI as string)
+    
+    // Get additional token data from getTokenData() for OmamoriNFTSingle
+    try {
+      const tokenData = await readContract(config, {
+        address: contractAddresses.OmamoriNFTSingle,
+        abi: OmamoriNFTSingleABI,
+        functionName: 'getTokenData',
+        args: [BigInt(tokenId)],
+      } as any)
+      
+      if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
+        // Update token with data from getTokenData
+        token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
+        token.materialId = Number(tokenData[1]) // materialId (uint16)
+        token.majorId = Number(tokenData[2]) // majorId (uint8)
+        token.minorId = Number(tokenData[3]) // minorId (uint8)
+        token.punchCount = Number(tokenData[4]) // punchCount (uint8)
+        // hypeBurned already handled in parseTokenURI
+      }
+    } catch (error) {
+      console.warn(`Failed to get token data for token ${tokenId}:`, error)
+    }
+    
+    return token
     
   } catch (error) {
     console.error(`Failed to fetch token ${tokenId}:`, error)
