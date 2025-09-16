@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useFairPreview, useInspirationGallery, useFairnessEducation, FIXED_RARITY_DISTRIBUTION } from "@/hooks/useFairPreview"
-import { Dice6, Shield, Info, RotateCcw, Sparkles } from "lucide-react"
+import { Dice6, Shield, Info, RotateCcw, Sparkles, Eye } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useOmamoriStore } from "@/store/omamoriStore"
+import { renderOmamoriSVG } from "@/lib/renderer/omamoriSvg"
+import { pickMaterial, getPunchCount } from "@/lib/utils/materialPicker"
+import majorsData from "@/data/majors.json"
 
 /**
  * Fair preview component that shows possibilities without prediction
@@ -69,6 +73,9 @@ export function FairPreview() {
           </div>
         </div>
       </Card>
+      
+      {/* SVG Preview Gallery */}
+      <SVGPreviewGallery />
       
       {/* Rarity Distribution */}
       <RarityDistribution />
@@ -250,6 +257,163 @@ function FairnessEducation({ education }: { education: any }) {
       </div>
     </Card>
   )
+}
+
+/**
+ * SVG Preview Gallery showing actual rendered examples
+ */
+function SVGPreviewGallery() {
+  const { selectedMajor, selectedMinor, hypeAmount } = useOmamoriStore()
+  const [currentExampleIndex, setCurrentExampleIndex] = useState(0)
+  
+  // Generate multiple preview examples with different materials
+  const previewExamples = useMemo(() => {
+    const major = majorsData[selectedMajor]
+    const minor = major?.minors[selectedMinor]
+    
+    if (!major || !minor) {
+      return []
+    }
+    
+    // Create 5 different examples with different seeds (but same user selections)
+    return Array.from({ length: 5 }, (_, i) => {
+      const exampleSeed = `fair_preview_${selectedMajor}_${selectedMinor}_${i}_${Date.now()}`
+      const material = pickMaterial(exampleSeed)
+      const punchCount = getPunchCount(exampleSeed)
+      
+      const tokenData = {
+        majorId: selectedMajor,
+        minorId: selectedMinor,
+        materialId: material.id,
+        punchCount,
+        seed: exampleSeed
+      }
+      
+      return {
+        ...tokenData,
+        materialName: material.name,
+        materialTier: material.tier,
+        svgContent: renderOmamoriSVG(tokenData)
+      }
+    })
+  }, [selectedMajor, selectedMinor, hypeAmount])
+  
+  // Cycle through examples
+  useEffect(() => {
+    if (previewExamples.length === 0) return
+    
+    const interval = setInterval(() => {
+      setCurrentExampleIndex((prev) => (prev + 1) % previewExamples.length)
+    }, 4000) // 4 second intervals
+    
+    return () => clearInterval(interval)
+  }, [previewExamples.length])
+  
+  if (previewExamples.length === 0) {
+    return (
+      <Card className="p-4">
+        <div className="text-center text-muted-foreground">
+          <Eye className="w-8 h-8 mx-auto mb-2 opacity-50" />
+          <div className="text-sm">Select Major and Minor glyphs to see preview examples</div>
+        </div>
+      </Card>
+    )
+  }
+  
+  const currentExample = previewExamples[currentExampleIndex]
+  
+  return (
+    <Card className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-mono text-sm flex items-center gap-2">
+          <Eye className="w-4 h-4" />
+          Visual Examples (Your Selections)
+        </h3>
+        <div className="text-xs text-muted-foreground">
+          {currentExampleIndex + 1} of {previewExamples.length}
+        </div>
+      </div>
+      
+      {/* SVG Preview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        {/* SVG Render */}
+        <div className="aspect-[5/7] bg-parchment paper-texture rounded border-2 border-amber-200 overflow-hidden">
+          <div 
+            className="w-full h-full"
+            dangerouslySetInnerHTML={{ __html: currentExample.svgContent }}
+          />
+        </div>
+        
+        {/* Example Details */}
+        <div className="space-y-3">
+          <div>
+            <div className="text-xs text-muted-foreground">Your Guaranteed Selections</div>
+            <div className="font-medium">{majorsData[selectedMajor].name}</div>
+            <div className="text-sm text-muted-foreground">{majorsData[selectedMajor].minors[selectedMinor].name}</div>
+          </div>
+          
+          <div>
+            <div className="text-xs text-muted-foreground">Random Material (This Example)</div>
+            <div className="font-medium">{currentExample.materialName}</div>
+            <div className={`text-sm font-medium ${getTierColor(currentExample.materialTier)}`}>
+              {currentExample.materialTier}
+            </div>
+          </div>
+          
+          <div>
+            <div className="text-xs text-muted-foreground">Random Punches (This Example)</div>
+            <div className="font-mono">{currentExample.punchCount}/25</div>
+          </div>
+          
+          <div>
+            <div className="text-xs text-muted-foreground">Your HYPE Burn (Metadata)</div>
+            <div className="font-mono">{hypeAmount} HYPE</div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Cycling Indicator */}
+      <div className="flex justify-center gap-1 mb-4">
+        {previewExamples.map((_, index) => (
+          <div
+            key={index}
+            className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
+              index === currentExampleIndex ? 'bg-blue-500' : 'bg-gray-300'
+            }`}
+            onClick={() => setCurrentExampleIndex(index)}
+          />
+        ))}
+      </div>
+      
+      {/* Critical Disclaimer */}
+      <div className="p-3 bg-red-50 border-2 border-red-200 rounded">
+        <div className="flex items-center gap-2 text-red-800 mb-2">
+          <Shield className="w-4 h-4" />
+          <span className="font-bold text-sm">⚠️ IMPORTANT: Preview ≠ Your Mint</span>
+        </div>
+        <div className="text-red-700 text-xs space-y-1">
+          <div>• Your actual mint will have DIFFERENT random material & punches</div>
+          <div>• Only your Major/Minor glyph selections are guaranteed</div>
+          <div>• These are just examples of what's POSSIBLE, not what you'll get</div>
+          <div>• Pure blockchain randomness determines your actual outcome</div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+/**
+ * Get tier color for material display
+ */
+function getTierColor(tier: string): string {
+  switch (tier.toLowerCase()) {
+    case 'legendary': return 'text-purple-600'
+    case 'epic': return 'text-pink-600'
+    case 'rare': return 'text-blue-600'
+    case 'uncommon': return 'text-green-600'
+    case 'common': return 'text-gray-600'
+    default: return 'text-gray-600'
+  }
 }
 
 /**
