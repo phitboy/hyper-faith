@@ -98,13 +98,45 @@ export async function getTokenByIdMock(tokenId: number): Promise<OmamoriToken | 
   return allTokens.find(t => t.tokenId === tokenId) || null;
 }
 
-// Future real implementation stubs
-export async function mintOmamoriOnChain(args: MintArgs): Promise<`0x${string}`> {
-  throw new Error('Real on-chain minting not implemented yet');
+// Real implementation imports
+import { fetchUserTokens, fetchRecentTokens, fetchTokenById } from './tokenQueries'
+
+/**
+ * Real implementation: Get user's minted tokens
+ */
+export async function getMyOmamori(address: `0x${string}`): Promise<OmamoriToken[]> {
+  return fetchUserTokens(address)
 }
 
-export async function readTokenMetadataOnChain(tokenId: number): Promise<OmamoriToken> {
-  throw new Error('Real on-chain reading not implemented yet');
+/**
+ * Real implementation: Get all tokens for exploration
+ */
+export async function getAllOmamori(): Promise<OmamoriToken[]> {
+  // Combine real tokens with seeded examples for better UX
+  const realTokens = await fetchRecentTokens(30)
+  const seededTokens = generateSeededTokens()
+  
+  // If we have real tokens, show them first, otherwise show examples
+  if (realTokens.length > 0) {
+    return [...realTokens, ...seededTokens.slice(0, 30)]
+  }
+  
+  return seededTokens
+}
+
+/**
+ * Real implementation: Get specific token by ID
+ */
+export async function getTokenById(tokenId: number): Promise<OmamoriToken | null> {
+  // Try real token first
+  const realToken = await fetchTokenById(tokenId)
+  if (realToken) {
+    return realToken
+  }
+  
+  // Fall back to seeded examples
+  const seededTokens = generateSeededTokens()
+  return seededTokens.find(t => t.tokenId === tokenId) || null
 }
 
 /**

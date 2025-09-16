@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useOmamoriStore } from "@/store/omamoriStore";
-import { getMyOmamoriMock } from "@/lib/contracts/omamori";
+import { getMyOmamori } from "@/lib/contracts/omamori";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { Link } from "react-router-dom";
 import majorsData from "@/data/majors.json";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 
 export default function MyOmamori() {
-  const { isConnected, myTokens, setMyTokens } = useOmamoriStore();
+  const { address, isConnected } = useAccount();
+  const { myTokens, setMyTokens } = useOmamoriStore();
   const [loading, setLoading] = useState(true);
   const [filteredTokens, setFilteredTokens] = useState<OmamoriToken[]>([]);
   const [filters, setFilters] = useState({
@@ -24,16 +26,21 @@ export default function MyOmamori() {
 
   useEffect(() => {
     loadMyTokens();
-  }, [isConnected]);
+  }, [isConnected, address]);
 
   useEffect(() => {
     applyFilters();
   }, [myTokens, filters]);
 
   const loadMyTokens = async () => {
+    if (!isConnected || !address) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const tokens = await getMyOmamoriMock();
+      const tokens = await getMyOmamori(address);
       setMyTokens(tokens);
     } catch (error) {
       console.error('Failed to load tokens:', error);

@@ -4,7 +4,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TraitTable } from "@/components/TraitTable";
-import { getTokenByIdMock } from "@/lib/contracts/omamori";
+import { getTokenById } from "@/lib/contracts/omamori";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { ArrowLeft, Copy, Download, Share2, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +26,7 @@ export default function TokenDetail() {
     
     try {
       setLoading(true);
-      const tokenData = await getTokenByIdMock(parseInt(id));
+      const tokenData = await getTokenById(parseInt(id));
       if (tokenData) {
         setToken(tokenData);
       } else {

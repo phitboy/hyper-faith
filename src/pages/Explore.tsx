@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getAllOmamoriMock } from "@/lib/contracts/omamori";
+import { getAllOmamori } from "@/lib/contracts/omamori";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { Link } from "react-router-dom";
 import majorsData from "@/data/majors.json";
@@ -33,7 +33,7 @@ export default function Explore() {
   const loadAllTokens = async () => {
     try {
       setLoading(true);
-      const tokens = await getAllOmamoriMock();
+      const tokens = await getAllOmamori();
       setAllTokens(tokens);
     } catch (error) {
       console.error('Failed to load tokens:', error);

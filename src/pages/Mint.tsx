@@ -1,33 +1,53 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAccount, useChainId } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Layout } from "@/components/Layout";
 import { MajorMinorPicker } from "@/components/MajorMinorPicker";
 import { HypeInput } from "@/components/HypeInput";
-import { OmamoriPreview } from "@/components/OmamoriPreview";
+import { FairPreview } from "@/components/FairPreview";
+import { GasEstimator } from "@/components/GasEstimator";
 import { useOmamoriStore } from "@/store/omamoriStore";
-import { mintOmamoriMock } from "@/lib/contracts/omamori";
+import { useMintOmamori, useWaitForMint, useTokenURI } from "@/hooks/useOmamoriContract";
+import { useOmamoriEvents } from "@/hooks/useContractEvents";
+import { parseTokenURI, extractTokenIdFromLogs, validateHypeAmount, getContractErrorMessage } from "@/lib/contracts/realOmamori";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TraitTable } from "@/components/TraitTable";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { Link } from "react-router-dom";
-import { Share2, Eye } from "lucide-react";
+import { Share2, Eye, Loader2 } from "lucide-react";
+import { hyperEVM } from "@/lib/chains";
 export default function Mint() {
+  const { toast } = useToast();
+  const { isConnected, address } = useAccount();
+  const chainId = useChainId();
   const {
-    toast
-  } = useToast();
-  const {
-    isConnected,
     selectedMajor,
     selectedMinor,
     hypeAmount,
     addToken
   } = useOmamoriStore();
-  const [isMinting, setIsMinting] = useState(false);
+  
+  // Contract hooks
+  const { mint, hash, error: mintError, isPending } = useMintOmamori();
+  const { data: receipt, isLoading: isConfirming } = useWaitForMint(hash);
+  
+  // State
+  const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
   const [mintedToken, setMintedToken] = useState<OmamoriToken | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
+  // Fetch token metadata after successful mint
+  const { data: tokenURI } = useTokenURI(mintedTokenId || undefined);
+  
+  // Check if we're on the correct network
+  const isCorrectNetwork = chainId === hyperEVM.id;
+  
+  // Enable real-time event listening
+  useOmamoriEvents();
+  
   const handleMint = async () => {
-    if (!isConnected) {
+    if (!isConnected || !address) {
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet to mint an Omamori",
@@ -35,36 +55,89 @@ export default function Mint() {
       });
       return;
     }
-    try {
-      setIsMinting(true);
-
-      // Convert HYPE to wei
-      const weiAmount = (parseFloat(hypeAmount) * 1e18).toString();
-      const token = await mintOmamoriMock({
-        majorId: selectedMajor,
-        minorId: selectedMinor,
-        offeringHype: weiAmount
-      });
-
-      // Add to store
-      addToken(token);
-      setMintedToken(token);
-      setShowSuccessModal(true);
+    
+    if (!isCorrectNetwork) {
       toast({
-        title: "Omamori Minted!",
-        description: `Successfully minted token #${token.tokenId}`
+        title: "Wrong Network",
+        description: "Please switch to HyperEVM network",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!validateHypeAmount(hypeAmount)) {
+      toast({
+        title: "Invalid Amount",
+        description: "Minimum 0.01 HYPE required to mint",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      await mint(hypeAmount);
+      
+      toast({
+        title: "Transaction Submitted",
+        description: "Waiting for confirmation...",
       });
     } catch (error) {
       console.error('Mint error:', error);
       toast({
         title: "Mint Failed",
-        description: error instanceof Error ? error.message : "Failed to mint Omamori",
+        description: getContractErrorMessage(error),
         variant: "destructive"
       });
-    } finally {
-      setIsMinting(false);
     }
   };
+  
+  // Handle successful transaction
+  React.useEffect(() => {
+    if (receipt && receipt.status === 'success') {
+      // Extract token ID from transaction logs
+      const tokenId = extractTokenIdFromLogs(receipt.logs);
+      
+      if (tokenId) {
+        setMintedTokenId(tokenId);
+        toast({
+          title: "Omamori Minted!",
+          description: `Successfully minted token #${tokenId}`,
+        });
+      }
+    }
+  }, [receipt, toast]);
+  
+  // Handle token metadata fetching
+  React.useEffect(() => {
+    if (mintedTokenId && tokenURI) {
+      try {
+        const token = parseTokenURI(mintedTokenId, tokenURI);
+        setMintedToken(token);
+        addToken(token);
+        setShowSuccessModal(true);
+      } catch (error) {
+        console.error('Failed to parse token metadata:', error);
+        toast({
+          title: "Metadata Error",
+          description: "Token minted but failed to load metadata",
+          variant: "destructive"
+        });
+      }
+    }
+  }, [mintedTokenId, tokenURI, addToken, toast]);
+  
+  // Handle mint errors
+  React.useEffect(() => {
+    if (mintError) {
+      toast({
+        title: "Transaction Failed",
+        description: getContractErrorMessage(mintError),
+        variant: "destructive"
+      });
+    }
+  }, [mintError, toast]);
+  
+  const isMinting = isPending || isConfirming;
   const handleShare = (token: OmamoriToken) => {
     const tweetText = `Just minted my Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
@@ -87,22 +160,37 @@ export default function Mint() {
               <HypeInput />
               
               {/* Mint Button */}
-              <Button onClick={handleMint} disabled={!isConnected || isMinting} className="w-full h-12 text-lg font-mono hover-lift focus-ring" size="lg">
-                {isMinting ? 'Burning HYPE...' : 'Burn HYPE & Mint'}
+              <Button 
+                onClick={handleMint} 
+                disabled={!isConnected || !isCorrectNetwork || isMinting} 
+                className="w-full h-12 text-lg font-mono hover-lift focus-ring" 
+                size="lg"
+              >
+                {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {isConfirming && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {isPending ? 'Confirm in Wallet...' : 
+                 isConfirming ? 'Minting...' : 
+                 'Burn HYPE & Mint'}
               </Button>
               
-              {!isConnected && <p className="text-sm text-muted-foreground text-center">
+              {!isConnected && (
+                <p className="text-sm text-muted-foreground text-center">
                   Connect your wallet above to mint
-                </p>}
+                </p>
+              )}
+              
+              {isConnected && !isCorrectNetwork && (
+                <p className="text-sm text-destructive text-center">
+                  Please switch to HyperEVM network to mint
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Right Column - Preview */}
+          {/* Right Column - Fair Preview */}
           <div className="space-y-6">
-            <div>
-              <h2 className="font-mono text-xl mb-4">Test Output (not live)</h2>
-              <OmamoriPreview className="hover-lift" />
-            </div>
+            <FairPreview />
+            <GasEstimator hypeAmount={hypeAmount} />
           </div>
         </div>
 
