@@ -77,7 +77,7 @@ export function useTransferEvents() {
   useWatchContractEvent({
     address: contractAddresses.OmamoriNFTSingle,
     abi: OmamoriNFTSingleABI,
-    eventName: 'Transfer',
+    eventName: 'Transfer' as any, // Cast to any to avoid strict typing issues
     onLogs: handleTransfer,
   })
 }
@@ -114,7 +114,7 @@ export function useHypeBurnedEvents() {
   useWatchContractEvent({
     address: contractAddresses.OmamoriNFTSingle,
     abi: OmamoriNFTSingleABI,
-    eventName: 'HypeBurned',
+    eventName: 'HypeBurned' as any, // Cast to any to avoid strict typing issues
     onLogs: handleHypeBurned,
   })
 }

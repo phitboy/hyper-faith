@@ -1,5 +1,5 @@
 import { useAccount } from 'wagmi'
-import { useTokenBalance, useTokenOfOwnerByIndex, useTokenURI } from './useOmamoriContract'
+import { useTokenBalance } from './useOmamoriContract'
 import { parseTokenURI } from '@/lib/contracts/realOmamori'
 import type { OmamoriToken } from '@/lib/contracts/omamori'
 import { useQuery } from '@tanstack/react-query'
@@ -72,29 +72,23 @@ async function fetchUserTokenByIndex(address: `0x${string}`, index: number): Pro
  * Hook to fetch a specific token by ID
  */
 export function useTokenById(tokenId?: number) {
-  const { data: tokenURI, isLoading, error } = useTokenURI(tokenId)
-  
-  const { data: token } = useQuery({
-    queryKey: ['token', tokenId, tokenURI],
+  return useQuery({
+    queryKey: ['token', tokenId],
     queryFn: async (): Promise<OmamoriToken | null> => {
-      if (!tokenId || !tokenURI) return null
+      if (!tokenId) return null
       
       try {
-        return parseTokenURI(tokenId, tokenURI)
+        // Use the fetchTokenById from tokenQueries which handles the contract call properly
+        const { fetchTokenById } = await import('@/lib/contracts/tokenQueries')
+        return await fetchTokenById(tokenId)
       } catch (error) {
         console.error(`Failed to parse token ${tokenId}:`, error)
         return null
       }
     },
-    enabled: !!tokenId && !!tokenURI,
+    enabled: !!tokenId,
     staleTime: 60000, // 1 minute
   })
-  
-  return {
-    token,
-    isLoading,
-    error,
-  }
 }
 
 /**

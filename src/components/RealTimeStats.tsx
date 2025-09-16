@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useRealTimeStats } from "@/hooks/useContractEvents"
-import { useTotalSupply } from "@/hooks/useOmamoriContract"
 import { TrendingUp, Users, Flame, Clock } from "lucide-react"
 import { formatEther } from "viem"
 
@@ -10,7 +9,6 @@ import { formatEther } from "viem"
  */
 export function RealTimeStats() {
   const stats = useRealTimeStats()
-  const { data: totalSupply } = useTotalSupply()
   
   const formatHype = (amount: number) => {
     return amount.toFixed(4)
@@ -19,7 +17,7 @@ export function RealTimeStats() {
   const statsItems = [
     {
       label: "Total Minted",
-      value: totalSupply ? Number(totalSupply).toLocaleString() : "0",
+      value: stats.totalMinted.toLocaleString(),
       icon: <TrendingUp className="w-4 h-4" />,
       change: stats.totalMinted > 0 ? `+${stats.totalMinted} today` : undefined,
     },

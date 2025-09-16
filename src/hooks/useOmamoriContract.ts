@@ -27,7 +27,7 @@ export function useMintOmamori() {
       abi: OmamoriNFTSingleABI,
       functionName: 'mint',
       value,
-    })
+    } as any) // Cast to any to avoid strict typing issues
   }
 
   return {

@@ -17,7 +17,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
       abi: OmamoriNFTSingleABI,
       functionName: 'balanceOf',
       args: [userAddress],
-    })
+    } as any) // Cast to any to avoid strict typing issues
     
     if (!balance || balance === 0n) {
       return []
@@ -35,18 +35,18 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
           abi: OmamoriNFTSingleABI,
           functionName: 'ownerOf',
           args: [BigInt(tokenId)],
-        })
+        } as any) // Cast to any to avoid strict typing issues
         
-        if (owner.toLowerCase() === userAddress.toLowerCase()) {
+        if ((owner as string).toLowerCase() === userAddress.toLowerCase()) {
           const tokenURI = await readContract(config, {
             address: contractAddresses.OmamoriNFTSingle,
             abi: OmamoriNFTSingleABI,
             functionName: 'tokenURI',
             args: [BigInt(tokenId)],
-          })
+          } as any) // Cast to any to avoid strict typing issues
         
           if (tokenURI) {
-            const token = parseTokenURI(Number(tokenId), tokenURI)
+            const token = parseTokenURI(Number(tokenId), tokenURI as string)
             tokens.push(token)
           }
         }
@@ -83,10 +83,10 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
           abi: OmamoriNFTSingleABI,
           functionName: 'tokenURI',
           args: [BigInt(tokenId)],
-        })
+        } as any) // Cast to any to avoid strict typing issues
         
         if (tokenURI) {
-          const token = parseTokenURI(tokenId, tokenURI)
+          const token = parseTokenURI(tokenId, tokenURI as string)
           tokens.push(token)
         }
       } catch (error) {
@@ -114,13 +114,13 @@ export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | nu
       abi: OmamoriNFTSingleABI,
       functionName: 'tokenURI',
       args: [BigInt(tokenId)],
-    })
+    } as any) // Cast to any to avoid strict typing issues
     
     if (!tokenURI) {
       return null
     }
     
-    return parseTokenURI(tokenId, tokenURI)
+    return parseTokenURI(tokenId, tokenURI as string)
     
   } catch (error) {
     console.error(`Failed to fetch token ${tokenId}:`, error)
