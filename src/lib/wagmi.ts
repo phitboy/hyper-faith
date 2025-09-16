@@ -12,7 +12,7 @@ import { hyperEVM } from './chains'
  */
 export const config = getDefaultConfig({
   appName: 'Hyper Faith Omamori',
-  projectId: process.env.VITE_WALLETCONNECT_PROJECT_ID || 'your-project-id', // Get from WalletConnect Cloud
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'your-project-id', // Get from WalletConnect Cloud
   chains: [hyperEVM],
   wallets: [
     {

@@ -19,4 +19,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    // Fix for browser compatibility
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    include: ['wagmi', 'viem', '@rainbow-me/rainbowkit'],
+  },
 }));
