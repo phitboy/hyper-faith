@@ -38,7 +38,7 @@ export const config = getDefaultConfig({
  */
 export const contractAddresses = {
   // NEW: Single contract with everything embedded (BEAUTIFUL SVG ART VERSION)
-  OmamoriNFTSingle: '0xa99928566A94b2091b3a3a6A98aDDeb7c655AA3f' as const,
+  OmamoriNFTSingle: '0xb4427574AC7941528b413AEDDC435B774040F518' as const,
   
   // Legacy multi-contract system (for reference)
   OmamoriNFTSecure: '0xef680bE6F1586d746562F4f5CB95b1e7829b9099' as const,
