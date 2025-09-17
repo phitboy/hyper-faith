@@ -50,14 +50,14 @@ export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
     
     return {
       tokenId,
-      majorId: parseInt(getAttributeValue('Major ID')) || 0, // Will be updated from getTokenData
-      minorId: parseInt(getAttributeValue('Minor ID')) || 0, // Will be updated from getTokenData
-      materialId: 0, // Will be filled from getTokenData
+      majorId: parseInt(getAttributeValue('Major ID')) || 0,
+      minorId: parseInt(getAttributeValue('Minor ID')) || 0,
+      materialId: 0, // Will be filled from getTokenData if needed
       materialName: getAttributeValue('Material') || 'Unknown',
       materialTier: getAttributeValue('Rarity') || 'Common',
-      punchCount: parseInt(getAttributeValue('Punches')) || 0, // Will be updated from getTokenData
+      punchCount: parseInt(getAttributeValue('Punches')) || 0,
       hypeBurned: hypeBurnedFormatted,
-      seed: getAttributeValue('Seed') || '0x0', // Will be updated from getTokenData
+      seed: getAttributeValue('Seed') || '0x0',
       imageSvg,
       mintedAt: Date.now(), // Approximate, could be improved with block timestamp
     } as OmamoriToken

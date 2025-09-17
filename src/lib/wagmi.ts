@@ -37,8 +37,8 @@ export const config = getDefaultConfig({
  * Contract addresses for HyperEVM
  */
 export const contractAddresses = {
-  // NEW: Single contract with everything embedded
-  OmamoriNFTSingle: '0x652B88e6D142Ca439Ce21fD363C6849A61c740c7' as const,
+  // NEW: Single contract with everything embedded (PRODUCTION VERSION)
+  OmamoriNFTSingle: '0xeC80195C13e99e89e295F6ac05888811c3eB5380' as const,
   
   // Legacy multi-contract system (for reference)
   OmamoriNFTSecure: '0xef680bE6F1586d746562F4f5CB95b1e7829b9099' as const,
