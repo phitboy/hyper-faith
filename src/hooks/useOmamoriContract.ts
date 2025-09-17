@@ -14,20 +14,21 @@ export function useOmamoriContract() {
 }
 
 /**
- * Hook for minting Omamori NFTs (Single Contract)
+ * Hook for minting Omamori NFTs (Single Contract) with user-selected arcanum
  */
 export function useMintOmamori() {
   const { writeContract, data: hash, error, isPending } = useWriteContract()
   
-  const mint = async (hypeAmount: string) => {
+  const mint = async (hypeAmount: string, majorId: number, minorId: number) => {
     const value = parseEther(hypeAmount)
     
     return writeContract({
       address: contractAddresses.OmamoriNFTSingle,
       abi: OmamoriNFTSingleABI,
       functionName: 'mint',
+      args: [majorId, minorId],
       value,
-    } as any) // Cast to any to avoid strict typing issues
+    })
   }
 
   return {

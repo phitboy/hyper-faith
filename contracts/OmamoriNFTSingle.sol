@@ -41,10 +41,14 @@ contract OmamoriNFTSingle is ERC721, Ownable, IERC2981 {
     }
     
     /**
-     * @notice Mint an Omamori NFT by burning native HYPE
+     * @notice Mint an Omamori NFT by burning native HYPE with user-selected arcanum
+     * @param majorId The major arcanum ID (0-11)
+     * @param minorId The minor aspect ID (0-3)
      */
-    function mint() external payable {
+    function mint(uint8 majorId, uint8 minorId) external payable {
         require(msg.value >= MIN_BURN, "Insufficient burn amount");
+        require(majorId < 12, "Invalid major ID");
+        require(minorId < 4, "Invalid minor ID");
         
         uint256 tokenId = _tokenIdCounter++;
         
@@ -52,22 +56,22 @@ contract OmamoriNFTSingle is ERC721, Ownable, IERC2981 {
         (bool success, ) = BURN_ADDRESS.call{value: msg.value}("");
         require(success, "HYPE burn failed");
         
-        // Generate pure random seed (NO msg.value influence for fairness)
+        // Generate seed from user choices and randomness (for material/punches only)
         uint64 seed = uint64(uint256(keccak256(abi.encodePacked(
             block.timestamp,
             block.prevrandao,
             msg.sender,
-            tokenId
+            tokenId,
+            majorId,
+            minorId
         ))));
         
-        // Select material using secure rarity distribution
+        // Select material and punch count using seed (random)
         uint16 materialId = _selectMaterialSecure(seed);
-        uint8 majorId = uint8(seed % 12);
-        uint8 minorId = uint8((seed >> 8) % 4);
         uint8 punchCount = uint8((seed >> 16) % 26);
         uint120 hypeBurned = uint120(msg.value);
         
-        // Pack data efficiently
+        // Pack data efficiently (using user-provided majorId and minorId)
         bytes32 packedData = bytes32(
             (uint256(seed) << 192) |
             (uint256(materialId) << 176) |

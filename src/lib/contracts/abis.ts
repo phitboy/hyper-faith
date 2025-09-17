@@ -69,7 +69,10 @@ export const OmamoriNFTSecureABI = [
   },
   // Write functions
   {
-    inputs: [],
+    inputs: [
+      { name: "majorId", type: "uint8" },
+      { name: "minorId", type: "uint8" }
+    ],
     name: "mint",
     outputs: [],
     stateMutability: "payable",
@@ -141,7 +144,10 @@ export const OmamoriNFTWithRoyaltiesABI = [
   },
   // Write functions
   {
-    inputs: [],
+    inputs: [
+      { name: "majorId", type: "uint8" },
+      { name: "minorId", type: "uint8" }
+    ],
     name: "mint",
     outputs: [],
     stateMutability: "payable",
@@ -250,7 +256,10 @@ export const OmamoriNFTSingleABI = [
   },
   // Write functions
   {
-    inputs: [],
+    inputs: [
+      { name: "majorId", type: "uint8" },
+      { name: "minorId", type: "uint8" }
+    ],
     name: "mint",
     outputs: [],
     stateMutability: "payable",

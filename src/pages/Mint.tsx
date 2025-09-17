@@ -75,7 +75,7 @@ export default function Mint() {
     }
     
     try {
-      await mint(hypeAmount);
+      await mint(hypeAmount, selectedMajor, selectedMinor);
       
       toast({
         title: "Transaction Submitted",

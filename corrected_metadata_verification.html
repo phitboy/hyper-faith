@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✅ CORRECTED: Major Arcanum & Minor Aspects Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .comparison { display: flex; gap: 20px; margin: 20px 0; }
+        .section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section h3 { margin-top: 0; color: #333; }
+        .correct { color: #28a745; font-weight: bold; }
+        .incorrect { color: #dc3545; font-weight: bold; text-decoration: line-through; }
+        .metadata { background: #f8f8f8; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        .metadata pre { margin: 0; font-size: 12px; }
+        .arcanum-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .arcanum-item { background: #e8f4fd; padding: 10px; border-radius: 5px; border-left: 4px solid #007bff; }
+        .minor-list { font-size: 0.9em; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ MAJOR ARCANUM & MINOR ASPECTS - CORRECTED!</h1>
+        
+        <div class="section">
+            <h3>🎯 Sample Token Verification (Major ID 5, Minor ID 1)</h3>
+            <div class="comparison">
+                <div style="flex: 1;">
+                    <h4 class="incorrect">❌ BEFORE (Incorrect)</h4>
+                    <ul>
+                        <li><strong>Major:</strong> <span class="incorrect">"Resistance"</span></li>
+                        <li><strong>Minor:</strong> <span class="incorrect">"Bearish"</span></li>
+                        <li><strong>Material:</strong> <span class="incorrect">"Brass"</span></li>
+                    </ul>
+                </div>
+                <div style="flex: 1;">
+                    <h4 class="correct">✅ AFTER (Correct)</h4>
+                    <ul>
+                        <li><strong>Major:</strong> <span class="correct">"Discipline"</span></li>
+                        <li><strong>Minor:</strong> <span class="correct">"Size"</span></li>
+                        <li><strong>Material:</strong> <span class="correct">"Slate"</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>📋 Complete Major Arcanum (12 Total)</h3>
+            <div class="arcanum-list">
+                <div class="arcanum-item">
+                    <strong>0. Liquidity</strong>
+                    <div class="minor-list">Fills, Market-Maker, Spread, Volume</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>1. Leverage</strong>
+                    <div class="minor-list">Margin, Liqd, Max Long, Max Short</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>2. Volatility</strong>
+                    <div class="minor-list">Pump, Dump, Chop, Pattern</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>3. Narrative</strong>
+                    <div class="minor-list">Insider, Hype, News, Cope</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>4. The Macro</strong>
+                    <div class="minor-list">Regulator, Bear, Bull, Black Swan</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>5. Discipline</strong>
+                    <div class="minor-list">Take Profit, <strong>Size</strong>, Strategy, Sideline</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>6. FOMO</strong>
+                    <div class="minor-list">BTFD, Top Signal, Market Price, Conviction</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>7. FUD</strong>
+                    <div class="minor-list">Shills, PsyOps, Rugs, Scam</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>8. RNG</strong>
+                    <div class="minor-list">Mints, Order Routing, Uptime, Prediction</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>9. Max Pain</strong>
+                    <div class="minor-list">Too Early, Too Late, Too Little, Too Much</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>10. The Chat</strong>
+                    <div class="minor-list">Alpha, Slop, In, Out</div>
+                </div>
+                <div class="arcanum-item">
+                    <strong>11. Ego</strong>
+                    <div class="minor-list">Touch Grass, Hyperliquid, Family, Needs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🎨 Updated Material Names (24 Total)</h3>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                <div><strong>Common (5):</strong><br>Wood, Cloth, Paper, Clay, Limestone</div>
+                <div><strong>Uncommon (6):</strong><br>Slate, Basalt, Granite, Marble, Bronze, Obsidian</div>
+                <div><strong>Rare (5):</strong><br>Silver, Jade, Crystal, Onyx, Amber</div>
+                <div><strong>Ultra Rare (6):</strong><br>Amethyst, Opal, Emerald, Sapphire, Ruby, Lapis</div>
+            </div>
+            <div style="margin-top: 10px;"><strong>Mythic (2):</strong> Gold, Meteorite</div>
+        </div>
+        
+        <div class="section">
+            <h3>🔧 Contract Updates Applied</h3>
+            <ul class="correct">
+                <li>✅ <strong>getMajorName()</strong> - Returns correct arcanum names</li>
+                <li>✅ <strong>getMinorName()</strong> - Returns correct aspect names based on major/minor ID</li>
+                <li>✅ <strong>getMaterialName()</strong> - Updated to match website data exactly</li>
+                <li>✅ <strong>getMaterialTier()</strong> - Fixed tier boundaries for proper rarity distribution</li>
+                <li>✅ <strong>tokenURI()</strong> - Now includes both human-readable names and IDs</li>
+                <li>✅ <strong>Major Glyph Rendering</strong> - Updated to match arcanum themes</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>📊 Verified Sample Output</h3>
+            <div class="metadata">
+                <pre>{
+  "name": "Omamori #1",
+  "description": "Ancient talismans for modern traders. Fully on-chain generative art.",
+  "attributes": [
+    { "trait_type": "Material", "value": "Slate" },           // ✅ Correct material name
+    { "trait_type": "Rarity", "value": "Uncommon" },          // ✅ Correct tier
+    { "trait_type": "Major", "value": "Discipline" },         // ✅ Correct arcanum
+    { "trait_type": "Minor", "value": "Size" },               // ✅ Correct aspect
+    { "trait_type": "Major ID", "value": 5 },                 // ✅ ID for reference
+    { "trait_type": "Minor ID", "value": 1 },                 // ✅ ID for reference
+    { "trait_type": "Punches", "value": 7 },                  // ✅ Punch count
+    { "trait_type": "Seed", "value": "0xc5241fb65b65e51d" },  // ✅ Deterministic seed
+    { "trait_type": "HYPE Burned", "value": 10000000000000000 } // ✅ Burn amount
+  ]
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🚀 Production Ready Status</h3>
+            <p><strong class="correct">OmamoriNFTSingle contract now matches website data perfectly!</strong></p>
+            <ul>
+                <li>✅ All 12 major arcanum names correct</li>
+                <li>✅ All 48 minor aspects (4 per major) correct</li>
+                <li>✅ All 24 material names match website</li>
+                <li>✅ Proper tier boundaries for rarity distribution</li>
+                <li>✅ Both human-readable names and IDs in metadata</li>
+                <li>✅ Beautiful SVG art with proper glyph rendering</li>
+                <li>✅ Complete JSON metadata structure</li>
+                <li>✅ Frontend parsing compatibility maintained</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

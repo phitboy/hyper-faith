@@ -12,8 +12,8 @@ contract Base64FixTest is Test {
     }
     
     function testTokenURIFormat() public {
-        // Mint a token
-        nft.mint{value: 0.01 ether}();
+        // Mint a token with Discipline (5) and Size (1)
+        nft.mint{value: 0.01 ether}(5, 1);
         
         // Get tokenURI
         string memory tokenURI = nft.tokenURI(1);
