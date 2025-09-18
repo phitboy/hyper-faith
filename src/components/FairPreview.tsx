@@ -285,14 +285,14 @@ function SVGPreviewGallery() {
         majorId: selectedMajor,
         minorId: selectedMinor,
         materialId: material.id,
+        materialName: material.name,
+        materialTier: material.tier as 'Common' | 'Uncommon' | 'Rare' | 'Ultra Rare' | 'Mythic',
         punchCount,
         seed: exampleSeed
       }
       
       return {
         ...tokenData,
-        materialName: material.name,
-        materialTier: material.tier,
         svgContent: renderOmamoriSVG(tokenData)
       }
     })

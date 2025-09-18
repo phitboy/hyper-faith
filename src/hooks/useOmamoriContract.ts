@@ -28,7 +28,7 @@ export function useMintOmamori() {
       functionName: 'mint',
       args: [majorId, minorId],
       value,
-    })
+    } as any)
   }
 
   return {
