@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { renderOmamoriSVG, getMaterialName, getMaterialTier, getMajorName, getMinorName } from "../_shared/renderer.ts"
+import { generateOmamoriSVG } from "../_shared/renderer.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,33 +40,43 @@ serve(async (req) => {
       )
     }
 
-    // For now, we'll use mock data since we need to implement contract interaction
-    // In production, you'd fetch this from the blockchain
-    const mockTokenData = {
-      seed: '0x1234567890abcdef',
-      materialId: 21, // Gold
-      majorId: 1, // Leverage
-      minorId: 0, // Margin
-      punchCount: 15,
-      hypeBurned: '1000000000000000000' // 1 HYPE
+    // Fetch token data from contract
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_call',
+        params: [{
+          to: contractAddress,
+          data: `0xc0831416${Number(tokenId).toString(16).padStart(64, '0')}` // getTokenData(uint256)
+        }, 'latest'],
+        id: 1
+      })
+    })
+
+    const result = await response.json()
+    
+    if (result.error) {
+      throw new Error(`Contract call failed: ${result.error.message}`)
     }
 
-    // Generate human-readable names
-    const materialName = getMaterialName(mockTokenData.materialId)
-    const materialTier = getMaterialTier(mockTokenData.materialId)
-    const majorName = getMajorName(mockTokenData.majorId)
-    const minorName = getMinorName(mockTokenData.majorId, mockTokenData.minorId)
+    // Decode the result (6 values: seed, materialId, majorId, minorId, punchCount, hypeBurned)
+    const data = result.result
+    if (!data || data === '0x') {
+      throw new Error('Token does not exist')
+    }
+
+    // Parse hex data (each value is 32 bytes)
+    const seed = BigInt('0x' + data.slice(2, 66))
+    const materialId = parseInt(data.slice(66, 130), 16)
+    const majorId = parseInt(data.slice(130, 194), 16)
+    const minorId = parseInt(data.slice(194, 258), 16)
+    const punchCount = parseInt(data.slice(258, 322), 16)
+    const hypeBurned = BigInt('0x' + data.slice(322, 386))
 
     // Generate high-quality SVG
-    const svg = renderOmamoriSVG({
-      seed: mockTokenData.seed,
-      materialId: mockTokenData.materialId,
-      majorId: mockTokenData.majorId,
-      minorId: mockTokenData.minorId,
-      punchCount: mockTokenData.punchCount,
-      materialName,
-      materialTier: materialTier as any,
-    })
+    const svg = generateOmamoriSVG(seed, materialId, majorId, minorId, punchCount, hypeBurned)
 
     // Return SVG with proper headers
     return new Response(svg, {

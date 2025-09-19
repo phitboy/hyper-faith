@@ -98,6 +98,7 @@ contract OmamoriNFTOffChain is ERC721, Ownable, IERC2981 {
         uint8 punchCount,
         uint120 hypeBurned
     ) {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         bytes32 data = tokenData[tokenId];
         seed = uint64(uint256(data) >> 192);
         materialId = uint16(uint256(data) >> 176);
