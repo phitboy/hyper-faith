@@ -8,9 +8,10 @@ import { HypeInput } from "@/components/HypeInput";
 import { FairPreview } from "@/components/FairPreview";
 import { GasEstimator } from "@/components/GasEstimator";
 import { useOmamoriStore } from "@/store/omamoriStore";
-import { useMintOmamori, useWaitForMint, useTokenURI } from "@/hooks/useOmamoriContract";
+import { useMintOmamori, useWaitForMint } from "@/hooks/useOmamoriContract";
 import { useOmamoriEvents } from "@/hooks/useContractEvents";
-import { parseTokenURI, extractTokenIdFromLogs, validateHypeAmount, getContractErrorMessage } from "@/lib/contracts/realOmamori";
+import { extractTokenIdFromLogs, validateHypeAmount, getContractErrorMessage } from "@/lib/contracts/realOmamori";
+import { fetchTokenById } from "@/lib/contracts/tokenQueries";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TraitTable } from "@/components/TraitTable";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
@@ -37,8 +38,7 @@ export default function Mint() {
   const [mintedToken, setMintedToken] = useState<OmamoriToken | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   
-  // Fetch token metadata after successful mint
-  const { data: tokenURI } = useTokenURI(mintedTokenId || undefined);
+  // Note: We now fetch token metadata directly using fetchTokenById instead of useTokenURI
   
   // Check if we're on the correct network
   const isCorrectNetwork = chainId === hyperEVM.id;
@@ -109,22 +109,30 @@ export default function Mint() {
   
   // Handle token metadata fetching
   React.useEffect(() => {
-    if (mintedTokenId && tokenURI) {
-      try {
-        const token = parseTokenURI(mintedTokenId, tokenURI);
-        setMintedToken(token);
-        addToken(token);
-        setShowSuccessModal(true);
-      } catch (error) {
-        console.error('Failed to parse token metadata:', error);
-        toast({
-          title: "Metadata Error",
-          description: "Token minted but failed to load metadata",
-          variant: "destructive"
-        });
-      }
+    if (mintedTokenId) {
+      const fetchTokenData = async () => {
+        try {
+          const token = await fetchTokenById(mintedTokenId);
+          if (token) {
+            setMintedToken(token);
+            addToken(token);
+            setShowSuccessModal(true);
+          } else {
+            throw new Error('Token not found');
+          }
+        } catch (error) {
+          console.error('Failed to fetch token metadata:', error);
+          toast({
+            title: "Metadata Error",
+            description: "Token minted but failed to load metadata",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      fetchTokenData();
     }
-  }, [mintedTokenId, tokenURI, addToken, toast]);
+  }, [mintedTokenId, addToken, toast]);
   
   // Handle mint errors
   React.useEffect(() => {

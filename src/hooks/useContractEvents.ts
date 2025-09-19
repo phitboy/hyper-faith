@@ -2,7 +2,7 @@ import { useWatchContractEvent, useAccount } from 'wagmi'
 import { useToast } from '@/hooks/use-toast'
 import { useOmamoriStore } from '@/store/omamoriStore'
 import { contractAddresses } from '@/lib/wagmi'
-import { OmamoriNFTOffChainABI } from '@/lib/contracts/abis'
+import { OmamoriNFTABI } from '@/lib/contracts/abis'
 import { parseTokenURI } from '@/lib/contracts/realOmamori'
 import { fetchTokenById } from '@/lib/contracts/tokenQueries'
 import { useCallback } from 'react'
@@ -75,8 +75,8 @@ export function useTransferEvents() {
   }, [address, toast, addToken, setAllTokens, allTokens])
 
   useWatchContractEvent({
-    address: contractAddresses.OmamoriNFTOffChain,
-    abi: OmamoriNFTOffChainABI,
+    address: contractAddresses.OmamoriNFT,
+    abi: OmamoriNFTABI,
     eventName: 'Transfer' as any, // Cast to any to avoid strict typing issues
     onLogs: handleTransfer,
   })
@@ -112,8 +112,8 @@ export function useHypeBurnedEvents() {
   }, [address, toast])
 
   useWatchContractEvent({
-    address: contractAddresses.OmamoriNFTOffChain,
-    abi: OmamoriNFTOffChainABI,
+    address: contractAddresses.OmamoriNFT,
+    abi: OmamoriNFTABI,
     eventName: 'HypeBurned' as any, // Cast to any to avoid strict typing issues
     onLogs: handleHypeBurned,
   })
