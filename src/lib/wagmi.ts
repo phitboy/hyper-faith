@@ -38,7 +38,7 @@ export const config = getDefaultConfig({
  */
 export const contractAddresses = {
   // CURRENT: New clean contract with off-chain rendering
-  OmamoriNFT: '0x8321884FFed9da6fE9F52BBF71ccb88FBB8a20E3' as const,
+  OmamoriNFT: '0x4257D5E87Ce57b74db90148A3Fe7052c93700215' as const,
   
   // Previous versions (deprecated)
   OmamoriNFTOffChain: '0x6B01f27dacE8237eA48590BADc37577A2f96A110' as const,
