@@ -133,12 +133,12 @@ contract OmamoriNFT is ERC721, Ownable, IERC2981 {
     function _selectMaterial(uint64 seed) internal pure returns (uint16) {
         uint256 roll = seed % 10000;
         
-        // Rarity distribution matching frontend
-        if (roll < 2083) return uint16(seed % 5);        // Common (20.83%): Wood, Cloth, Paper, Clay, Limestone
-        if (roll < 4583) return uint16(5 + (seed % 6));  // Uncommon (25%): Slate, Basalt, Granite, Marble, Bronze, Obsidian
-        if (roll < 6583) return uint16(11 + (seed % 5)); // Rare (20%): Silver, Jade, Crystal, Onyx, Amber
-        if (roll < 8083) return uint16(16 + (seed % 6)); // Ultra Rare (15%): Amethyst, Opal, Emerald, Sapphire, Ruby, Lapis
-        return uint16(22 + (seed % 2));                  // Mythic (19.17%): Gold, Meteorite
+        // Rarity distribution matching website expectations
+        if (roll < 5000) return uint16(seed % 5);        // Common (50%): Wood, Cloth, Paper, Clay, Limestone
+        if (roll < 7500) return uint16(5 + (seed % 6));  // Uncommon (25%): Slate, Basalt, Granite, Marble, Bronze, Obsidian
+        if (roll < 9000) return uint16(11 + (seed % 5)); // Rare (15%): Silver, Jade, Crystal, Onyx, Amber
+        if (roll < 9750) return uint16(16 + (seed % 6)); // Ultra Rare (7.5%): Amethyst, Opal, Emerald, Sapphire, Ruby, Lapis
+        return uint16(22 + (seed % 2));                  // Mythic (2.5%): Gold, Meteorite
     }
     
     /**
