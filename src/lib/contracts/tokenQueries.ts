@@ -1,7 +1,7 @@
 import { readContract } from 'wagmi/actions'
 import { config } from '@/lib/wagmi'
 import { contractAddresses } from '@/lib/wagmi'
-import { OmamoriNFTOffChainABI } from './abis'
+import { OmamoriNFTABI } from './abis'
 import { parseTokenURI } from './realOmamori'
 import type { OmamoriToken } from './omamori'
 
@@ -13,8 +13,8 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
   try {
     // Get user's token balance
     const balance = await readContract(config, {
-      address: contractAddresses.OmamoriNFTOffChain,
-      abi: OmamoriNFTOffChainABI,
+      address: contractAddresses.OmamoriNFT,
+      abi: OmamoriNFTABI,
       functionName: 'balanceOf',
       args: [userAddress],
     } as any) // Cast to any to avoid strict typing issues
@@ -32,7 +32,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
       try {
         const owner = await readContract(config, {
           address: contractAddresses.OmamoriNFTOffChain,
-          abi: OmamoriNFTOffChainABI,
+          abi: OmamoriNFTABI,
           functionName: 'ownerOf',
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
@@ -40,7 +40,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
         if ((owner as string).toLowerCase() === userAddress.toLowerCase()) {
           const tokenURI = await readContract(config, {
             address: contractAddresses.OmamoriNFTOffChain,
-            abi: OmamoriNFTOffChainABI,
+            abi: OmamoriNFTABI,
             functionName: 'tokenURI',
             args: [BigInt(tokenId)],
           } as any) // Cast to any to avoid strict typing issues
@@ -52,19 +52,19 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
             try {
               const tokenData = await readContract(config, {
                 address: contractAddresses.OmamoriNFTOffChain,
-                abi: OmamoriNFTOffChainABI,
+                abi: OmamoriNFTABI,
                 functionName: 'getTokenData',
                 args: [BigInt(tokenId)],
               } as any)
               
               if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
-                // Update token with data from getTokenData
-                token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
-                token.materialId = Number(tokenData[1]) // materialId (uint16)
-                token.majorId = Number(tokenData[2]) // majorId (uint8)
-                token.minorId = Number(tokenData[3]) // minorId (uint8)
-                token.punchCount = Number(tokenData[4]) // punchCount (uint8)
-                // hypeBurned already handled in parseTokenURI
+                // Update token with data from getTokenData (new contract structure)
+                token.majorId = Number(tokenData[0]) // majorId (uint8)
+                token.minorId = Number(tokenData[1]) // minorId (uint8)
+                token.materialId = Number(tokenData[2]) // materialId (uint16)
+                token.punchCount = Number(tokenData[3]) // punchCount (uint8)
+                token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
+                token.hypeBurned = tokenData[5].toString() // hypeBurned (uint120)
               }
             } catch (error) {
               console.warn(`Failed to get token data for token ${tokenId}:`, error)
@@ -103,7 +103,7 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
       try {
         const tokenURI = await readContract(config, {
           address: contractAddresses.OmamoriNFTOffChain,
-          abi: OmamoriNFTOffChainABI,
+          abi: OmamoriNFTABI,
           functionName: 'tokenURI',
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
@@ -115,19 +115,19 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
                  try {
                    const tokenData = await readContract(config, {
                      address: contractAddresses.OmamoriNFTOffChain,
-                     abi: OmamoriNFTOffChainABI,
+                     abi: OmamoriNFTABI,
                      functionName: 'getTokenData',
                      args: [BigInt(tokenId)],
                    } as any)
                    
                    if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
-                     // Update token with data from getTokenData
-                     token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
-                     token.materialId = Number(tokenData[1]) // materialId (uint16)
-                     token.majorId = Number(tokenData[2]) // majorId (uint8)
-                     token.minorId = Number(tokenData[3]) // minorId (uint8)
-                     token.punchCount = Number(tokenData[4]) // punchCount (uint8)
-                     // hypeBurned already handled in parseTokenURI
+                     // Update token with data from getTokenData (new contract structure)
+                     token.majorId = Number(tokenData[0]) // majorId (uint8)
+                     token.minorId = Number(tokenData[1]) // minorId (uint8)
+                     token.materialId = Number(tokenData[2]) // materialId (uint16)
+                     token.punchCount = Number(tokenData[3]) // punchCount (uint8)
+                     token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
+                     token.hypeBurned = tokenData[5].toString() // hypeBurned (uint120)
                    }
                  } catch (error) {
                    console.warn(`Failed to get token data for token ${tokenId}:`, error)
@@ -156,8 +156,8 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
 export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | null> {
   try {
     const tokenURI = await readContract(config, {
-      address: contractAddresses.OmamoriNFTOffChain,
-      abi: OmamoriNFTOffChainABI,
+      address: contractAddresses.OmamoriNFT,
+      abi: OmamoriNFTABI,
       functionName: 'tokenURI',
       args: [BigInt(tokenId)],
     } as any) // Cast to any to avoid strict typing issues
@@ -172,19 +172,19 @@ export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | nu
     try {
       const tokenData = await readContract(config, {
         address: contractAddresses.OmamoriNFTOffChain,
-        abi: OmamoriNFTOffChainABI,
+            abi: OmamoriNFTABI,
         functionName: 'getTokenData',
         args: [BigInt(tokenId)],
       } as any)
       
       if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
-        // Update token with data from getTokenData
-        token.seed = `0x${tokenData[0].toString(16)}` // seed (uint64)
-        token.materialId = Number(tokenData[1]) // materialId (uint16)
-        token.majorId = Number(tokenData[2]) // majorId (uint8)
-        token.minorId = Number(tokenData[3]) // minorId (uint8)
-        token.punchCount = Number(tokenData[4]) // punchCount (uint8)
-        // hypeBurned already handled in parseTokenURI
+        // Update token with data from getTokenData (new contract structure)
+        token.majorId = Number(tokenData[0]) // majorId (uint8)
+        token.minorId = Number(tokenData[1]) // minorId (uint8)
+        token.materialId = Number(tokenData[2]) // materialId (uint16)
+        token.punchCount = Number(tokenData[3]) // punchCount (uint8)
+        token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
+        token.hypeBurned = tokenData[5].toString() // hypeBurned (uint120)
       }
     } catch (error) {
       console.warn(`Failed to get token data for token ${tokenId}:`, error)
