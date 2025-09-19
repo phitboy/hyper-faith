@@ -25,21 +25,9 @@ async function fetchTokenMetadata(tokenId: number, tokenURI: string): Promise<Om
         return attr ? attr.value : undefined
       }
       
-      // Fetch the actual SVG content from the image URL
-      let imageSvg = ''
-      if (metadata.image && metadata.image.startsWith('http')) {
-        try {
-          const svgResponse = await fetch(metadata.image)
-          if (svgResponse.ok) {
-            imageSvg = await svgResponse.text()
-          }
-        } catch (error) {
-          console.warn(`Failed to fetch SVG for token ${tokenId}:`, error)
-          imageSvg = metadata.image // Fallback to URL
-        }
-      } else {
-        imageSvg = metadata.image || ''
-      }
+      // For now, just use the SVG URL directly instead of fetching content
+      // The frontend can display this as an iframe or img tag
+      const imageSvg = metadata.image || ''
       
       return {
         tokenId,

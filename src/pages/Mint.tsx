@@ -210,9 +210,17 @@ export default function Mint() {
                 {/* Token Preview */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="aspect-[5/7] bg-parchment paper-texture rounded overflow-hidden">
-                    <div className="w-full h-full" dangerouslySetInnerHTML={{
-                  __html: mintedToken.imageSvg
-                }} />
+                    {mintedToken.imageSvg.startsWith('http') ? (
+                      <img 
+                        src={mintedToken.imageSvg} 
+                        alt={`Omamori #${mintedToken.tokenId}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full" dangerouslySetInnerHTML={{
+                        __html: mintedToken.imageSvg
+                      }} />
+                    )}
                   </div>
                   
                   <TraitTable token={mintedToken} />

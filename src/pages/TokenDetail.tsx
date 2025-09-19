@@ -192,10 +192,18 @@ export default function TokenDetail() {
             {/* Large SVG Display */}
             <Card className="overflow-hidden">
               <div className="aspect-[5/7] bg-parchment paper-texture">
-                <div 
-                  className="w-full h-full"
-                  dangerouslySetInnerHTML={{ __html: token.imageSvg }}
-                />
+                {token.imageSvg.startsWith('http') ? (
+                  <img 
+                    src={token.imageSvg} 
+                    alt={`Omamori #${token.tokenId}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div 
+                    className="w-full h-full"
+                    dangerouslySetInnerHTML={{ __html: token.imageSvg }}
+                  />
+                )}
               </div>
             </Card>
             
