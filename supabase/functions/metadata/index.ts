@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { getMaterial, getMajor, getMinorName } from "../_shared/renderer.ts"
+import { generateMetadata } from "../_shared/renderer.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -68,39 +68,27 @@ serve(async (req) => {
       throw new Error('Token does not exist')
     }
 
-    // Parse hex data (each value is 32 bytes)
-    const seed = BigInt('0x' + data.slice(2, 66))
-    const materialId = parseInt(data.slice(66, 130), 16)
-    const majorId = parseInt(data.slice(130, 194), 16)
-    const minorId = parseInt(data.slice(194, 258), 16)
-    const punchCount = parseInt(data.slice(258, 322), 16)
+    // Parse token data struct (6 fields, each 32 bytes)
+    const majorId = parseInt(data.slice(2, 66), 16)
+    const minorId = parseInt(data.slice(66, 130), 16)
+    const materialId = parseInt(data.slice(130, 194), 16)
+    const punchCount = parseInt(data.slice(194, 258), 16)
+    const seed = BigInt('0x' + data.slice(258, 322))
     const hypeBurned = BigInt('0x' + data.slice(322, 386))
 
-    // Generate human-readable names
-    const material = getMaterial(materialId)
-    const major = getMajor(majorId)
-    const minorName = getMinorName(majorId, minorId)
+    // Generate metadata using our new function
+    const metadata = generateMetadata(
+      Number(tokenId),
+      seed,
+      materialId,
+      majorId,
+      minorId,
+      punchCount,
+      hypeBurned
+    )
 
-    // Format HYPE burned amount
-    const hypeBurnedFormatted = (Number(hypeBurned) / 1e18).toFixed(4)
-
-    // Generate metadata JSON
-    const metadata = {
-      name: `Omamori #${tokenId}`,
-      description: "Ancient talismans for modern traders. High-quality off-chain generative art powered by Supabase Edge Functions.",
-      image: `${baseUrl}/functions/v1/render/${tokenId}`,
-      attributes: [
-        { trait_type: "Material", value: material.name },
-        { trait_type: "Rarity Tier", value: material.tier },
-        { trait_type: "Major Arcanum", value: major.name },
-        { trait_type: "Minor Arcanum", value: minorName },
-        { trait_type: "Major ID", value: majorId },
-        { trait_type: "Minor ID", value: minorId },
-        { trait_type: "Punch Count", value: punchCount },
-        { trait_type: "Seed", value: `0x${seed.toString(16)}` },
-        { trait_type: "HYPE Burned", value: hypeBurnedFormatted },
-      ],
-    }
+    // Update image URL to point to our render endpoint
+    metadata.image = `${baseUrl}/functions/v1/render/${tokenId}`
 
     return new Response(JSON.stringify(metadata), {
       headers: {

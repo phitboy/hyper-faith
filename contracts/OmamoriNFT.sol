@@ -3,197 +3,174 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IMaterials.sol";
+import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
 /**
  * @title OmamoriNFT
- * @notice Core ERC-721 contract for Omamori tablets with HYPE burning and renderer integration
- * @dev Multi-contract architecture with external rendering system
- * @author Hyper Faith Team
+ * @notice Clean, minimal Omamori NFT with off-chain rendering
+ * @dev Stores essential mint data, points to off-chain metadata service
  */
-contract OmamoriNFT is ERC721, Ownable {
+contract OmamoriNFT is ERC721, Ownable, IERC2981 {
     
-    /// @notice Deployed MaterialRegistry contract
-    IMaterials public constant MATERIALS = IMaterials(0xA5D308DE0Be64df79C6715418070a090195A5657);
-    
-    /// @notice Burn address for HYPE (assistance fund)
+    /// @notice Burn address for HYPE
     address public constant BURN_ADDRESS = 0xfefeFEFeFEFEFEFEFeFefefefefeFEfEfefefEfe;
     
-    /// @notice Minimum HYPE burn amount (0.01 HYPE in wei)
-    uint256 public constant MIN_BURN = 10000000000000000; // 0.01 * 1e18
+    /// @notice Minimum HYPE burn amount (0.01 HYPE)
+    uint256 public constant MIN_BURN = 10000000000000000;
     
     /// @notice Current token ID counter
     uint256 private _tokenIdCounter = 1;
     
-    /// @notice Rendering system contracts
-    address public glyphRenderer;
-    address public punchRenderer;
-    address public svgAssembler;
+    /// @notice Base URI for metadata service
+    string private _baseTokenURI;
     
-    /// @notice Token data storage
+    /// @notice Token data structure
     struct TokenData {
-        uint8 majorId;      // 0-11
-        uint8 minorId;      // 0-3  
-        uint16 materialId;  // 0-23
-        uint8 punchCount;   // 0-25
-        uint64 seed;        // Random seed
-        uint128 hypeBurned; // Amount of HYPE burned
+        uint8 majorId;      // User selected major arcanum (0-11)
+        uint8 minorId;      // User selected minor aspect (0-3)
+        uint16 materialId;  // Randomly determined material (0-23)
+        uint8 punchCount;   // Randomly determined punch count (0-25)
+        uint64 seed;        // Deterministic randomness seed
+        uint120 hypeBurned; // Amount of HYPE burned (wei)
     }
     
-    /// @notice Token data mapping
-    mapping(uint256 => TokenData) public tokenData;
+    /// @notice Token data storage
+    mapping(uint256 => TokenData) public tokens;
+    
+    /// @notice Royalty configuration
+    address public royaltyRecipient;
+    uint96 public royaltyBasisPoints; // 500 = 5%
     
     /// @notice Events
     event HypeBurned(address indexed burner, uint256 indexed tokenId, uint256 amount);
-    event RenderersUpdated(address glyphRenderer, address punchRenderer, address svgAssembler);
     
-    constructor(address _initialOwner) 
+    constructor(
+        address _initialOwner,
+        address _royaltyRecipient,
+        string memory _baseTokenURI
+    ) 
         ERC721("Hyperliquid Omamori", "OMAMORI") 
         Ownable(_initialOwner) 
-    {}
+    {
+        royaltyRecipient = _royaltyRecipient;
+        royaltyBasisPoints = 500; // 5%
+        _baseTokenURI = _baseTokenURI;
+    }
     
     /**
-     * @notice Mint an Omamori NFT by burning native HYPE
+     * @notice Mint an Omamori NFT by burning HYPE with user-selected arcanum
+     * @param majorId The major arcanum ID (0-11)
+     * @param minorId The minor aspect ID (0-3)
+     * @return tokenId The ID of the newly minted token
      */
-    function mint() external payable {
-        require(msg.value >= MIN_BURN, "Insufficient burn amount");
+    function mint(uint8 majorId, uint8 minorId) external payable returns (uint256) {
+        require(msg.value >= MIN_BURN, "Insufficient HYPE burn amount");
+        require(majorId < 12, "Invalid major arcanum ID");
+        require(minorId < 4, "Invalid minor aspect ID");
         
         uint256 tokenId = _tokenIdCounter++;
         
-        // Burn native HYPE
-        (bool success, ) = BURN_ADDRESS.call{value: msg.value}("");
-        require(success, "HYPE burn failed");
-        
-        // Generate deterministic seed
+        // Generate deterministic seed from block data and user input
         uint64 seed = uint64(uint256(keccak256(abi.encodePacked(
             block.timestamp,
             block.prevrandao,
             msg.sender,
             tokenId,
-            msg.value
+            majorId,
+            minorId
         ))));
         
-        // Select material using deployed registry
+        // Select material and punch count based on seed
         uint16 materialId = _selectMaterial(seed);
-        
-        // Generate other attributes
-        uint8 majorId = uint8(seed % 12);
-        uint8 minorId = uint8((seed >> 8) % 4);
-        uint8 punchCount = uint8((seed >> 16) % 26); // 0-25
+        uint8 punchCount = uint8((seed >> 32) % 26); // 0-25 punches
         
         // Store token data
-        tokenData[tokenId] = TokenData({
+        tokens[tokenId] = TokenData({
             majorId: majorId,
             minorId: minorId,
             materialId: materialId,
             punchCount: punchCount,
             seed: seed,
-            hypeBurned: uint128(msg.value)
+            hypeBurned: uint120(msg.value)
         });
         
-        // Mint NFT
-        _mint(msg.sender, tokenId);
+        // Burn HYPE by sending to burn address
+        (bool success, ) = BURN_ADDRESS.call{value: msg.value}("");
+        require(success, "HYPE burn failed");
+        
+        // Mint NFT to user
+        _safeMint(msg.sender, tokenId);
         
         emit HypeBurned(msg.sender, tokenId, msg.value);
+        
+        return tokenId;
     }
     
     /**
-     * @notice Generate tokenURI with rendering system integration
-     */
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        _requireOwned(tokenId);
-        
-        // If rendering system is not set up, return basic metadata
-        if (svgAssembler == address(0)) {
-            return _generateBasicTokenURI(tokenId);
-        }
-        
-        // Use rendering system for complete SVG art
-        TokenData memory data = tokenData[tokenId];
-        
-        // Call SVG assembler which orchestrates the full rendering
-        return ISVGAssembler(svgAssembler).generateTokenURI(
-            tokenId,
-            data.majorId,
-            data.minorId,
-            data.materialId,
-            data.punchCount,
-            data.seed,
-            data.hypeBurned
-        );
-    }
-    
-    /**
-     * @notice Generate basic tokenURI for development phase (no SVG art)
-     */
-    function _generateBasicTokenURI(uint256 tokenId) internal view returns (string memory) {
-        TokenData memory data = tokenData[tokenId];
-        IMaterials.MaterialView memory material = MATERIALS.viewMaterial(data.materialId);
-        
-        // Create basic JSON metadata
-        string memory json = string(abi.encodePacked(
-            '{"name":"Omamori #', _toString(tokenId), '",',
-            '"description":"Ancient talismans for modern traders. Rendering system pending deployment.",',
-            '"attributes":[',
-                '{"trait_type":"Material","value":"', material.name, '"},',
-                '{"trait_type":"Rarity","value":"', material.tierName, '"},',
-                '{"trait_type":"Major ID","value":', _toString(data.majorId), '},',
-                '{"trait_type":"Minor ID","value":', _toString(data.minorId), '},',
-                '{"trait_type":"Punches","value":', _toString(data.punchCount), '},',
-                '{"trait_type":"HYPE Burned","value":', _toString(data.hypeBurned), '}',
-            ']}'
-        ));
-        
-        return string(abi.encodePacked(
-            "data:application/json;base64,",
-            _base64Encode(bytes(json))
-        ));
-    }
-    
-    /**
-     * @notice Set rendering system contracts (owner only)
-     */
-    function setRenderers(
-        address _glyphRenderer,
-        address _punchRenderer, 
-        address _svgAssembler
-    ) external onlyOwner {
-        glyphRenderer = _glyphRenderer;
-        punchRenderer = _punchRenderer;
-        svgAssembler = _svgAssembler;
-        
-        emit RenderersUpdated(_glyphRenderer, _punchRenderer, _svgAssembler);
-    }
-    
-    /**
-     * @notice Get token data for external rendering
+     * @notice Get token data for a given token ID
+     * @param tokenId The token ID to query
+     * @return Token data struct
      */
     function getTokenData(uint256 tokenId) external view returns (TokenData memory) {
-        _requireOwned(tokenId);
-        return tokenData[tokenId];
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        return tokens[tokenId];
     }
     
     /**
-     * @notice Select material using deployed registry weighted selection
+     * @notice Generate token URI pointing to off-chain metadata service
+     * @param tokenId The token ID to generate URI for
+     * @return The complete token URI
      */
-    function _selectMaterial(uint64 seed) internal view returns (uint16) {
-        uint256 totalWeight = MATERIALS.totalWeight();
-        uint256 randomValue = uint256(seed) % totalWeight;
-        
-        uint256 cumulativeWeight = 0;
-        for (uint16 i = 0; i < 24; i++) {
-            cumulativeWeight += MATERIALS.weight(i);
-            if (randomValue < cumulativeWeight) {
-                return i;
-            }
-        }
-        
-        return 23; // Fallback to last material
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        return string(abi.encodePacked(_baseTokenURI, _toString(tokenId)));
     }
     
     /**
-     * @notice Convert uint256 to string
+     * @notice Secure material selection with proper rarity distribution
+     * @dev Matches the frontend material selection logic exactly
      */
+    function _selectMaterial(uint64 seed) internal pure returns (uint16) {
+        uint256 roll = seed % 10000;
+        
+        // Rarity distribution matching frontend
+        if (roll < 2083) return uint16(seed % 5);        // Common (20.83%): Wood, Cloth, Paper, Clay, Limestone
+        if (roll < 4583) return uint16(5 + (seed % 6));  // Uncommon (25%): Slate, Basalt, Granite, Marble, Bronze, Obsidian
+        if (roll < 6583) return uint16(11 + (seed % 5)); // Rare (20%): Silver, Jade, Crystal, Onyx, Amber
+        if (roll < 8083) return uint16(16 + (seed % 6)); // Ultra Rare (15%): Amethyst, Opal, Emerald, Sapphire, Ruby, Lapis
+        return uint16(22 + (seed % 2));                  // Mythic (19.17%): Gold, Meteorite
+    }
+    
+    /**
+     * @notice EIP-2981 royalty info
+     */
+    function royaltyInfo(uint256, uint256 salePrice) external view returns (address, uint256) {
+        uint256 royaltyAmount = (salePrice * royaltyBasisPoints) / 10000;
+        return (royaltyRecipient, royaltyAmount);
+    }
+    
+    /**
+     * @notice EIP-165 interface support
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
+        return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
+    }
+    
+    // Owner functions
+    function setBaseURI(string memory newBaseURI) external onlyOwner {
+        _baseTokenURI = newBaseURI;
+    }
+    
+    function setRoyaltyRecipient(address newRecipient) external onlyOwner {
+        royaltyRecipient = newRecipient;
+    }
+    
+    function setRoyaltyBasisPoints(uint96 newBasisPoints) external onlyOwner {
+        require(newBasisPoints <= 1000, "Royalty too high"); // Max 10%
+        royaltyBasisPoints = newBasisPoints;
+    }
+    
+    // Utility function
     function _toString(uint256 value) internal pure returns (string memory) {
         if (value == 0) return "0";
         
@@ -203,76 +180,12 @@ contract OmamoriNFT is ERC721, Ownable {
             digits++;
             temp /= 10;
         }
-        
         bytes memory buffer = new bytes(digits);
         while (value != 0) {
             digits -= 1;
             buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
             value /= 10;
         }
-        
         return string(buffer);
     }
-    
-    /**
-     * @notice Base64 encoding
-     */
-    function _base64Encode(bytes memory data) internal pure returns (string memory) {
-        if (data.length == 0) return "";
-        
-        string memory table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        uint256 encodedLen = 4 * ((data.length + 2) / 3);
-        string memory result = new string(encodedLen + 32);
-        
-        assembly {
-            let tablePtr := add(table, 1)
-            let resultPtr := add(result, 32)
-            
-            for {
-                let dataPtr := data
-                let endPtr := add(dataPtr, mload(data))
-            } lt(dataPtr, endPtr) {
-                
-            } {
-                dataPtr := add(dataPtr, 3)
-                let input := mload(dataPtr)
-                
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(18, input), 0x3F))))
-                resultPtr := add(resultPtr, 1)
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(12, input), 0x3F))))
-                resultPtr := add(resultPtr, 1)
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(6, input), 0x3F))))
-                resultPtr := add(resultPtr, 1)
-                mstore8(resultPtr, mload(add(tablePtr, and(input, 0x3F))))
-                resultPtr := add(resultPtr, 1)
-            }
-            
-            switch mod(mload(data), 3)
-            case 1 {
-                mstore8(sub(resultPtr, 2), 0x3d)
-                mstore8(sub(resultPtr, 1), 0x3d)
-            }
-            case 2 {
-                mstore8(sub(resultPtr, 1), 0x3d)
-            }
-        }
-        
-        return result;
-    }
-}
-
-/**
- * @title ISVGAssembler
- * @notice Interface for SVG assembler contract
- */
-interface ISVGAssembler {
-    function generateTokenURI(
-        uint256 tokenId,
-        uint8 majorId,
-        uint8 minorId,
-        uint16 materialId,
-        uint8 punchCount,
-        uint64 seed,
-        uint256 hypeBurned
-    ) external view returns (string memory);
 }

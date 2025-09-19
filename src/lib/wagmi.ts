@@ -37,17 +37,14 @@ export const config = getDefaultConfig({
  * Contract addresses for HyperEVM
  */
 export const contractAddresses = {
-  // NEW: Off-chain rendering contract with Supabase Edge Functions
-  OmamoriNFTOffChain: '0x6B01f27dacE8237eA48590BADc37577A2f96A110' as const,
+  // CURRENT: New clean contract with off-chain rendering
+  OmamoriNFT: '0xb7A785385C5224d9915bfA760e8F6a32E0a46201' as const,
   
-  // Previous versions (for reference)
+  // Previous versions (deprecated)
+  OmamoriNFTOffChain: '0x6B01f27dacE8237eA48590BADc37577A2f96A110' as const,
   OmamoriNFTSingle: '0xb4427574AC7941528b413AEDDC435B774040F518' as const,
   OmamoriNFTSecure: '0xef680bE6F1586d746562F4f5CB95b1e7829b9099' as const,
   OmamoriNFTWithRoyalties: '0x95d7a58c9efC295362deF554761909Ebc42181b1' as const,
-  SVGAssembler: '0xB42ac8659c9F661EB548C68e67F432cF5D2aa52c' as const,
-  GlyphRenderer: '0x11Bb63863024444A5E4BB4d157aaDDc8441C8618' as const,
-  PunchRenderer: '0x72cFcB2e443b4D6AA341871C85Cbd390aE0Ab2Af' as const,
-  MaterialRegistry: '0xA5D308DE0Be64df79C6715418070a090195A5657' as const,
 } as const
 
 /**

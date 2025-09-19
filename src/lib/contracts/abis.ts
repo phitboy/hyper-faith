@@ -3,6 +3,117 @@
  * These are the essential functions we need for the frontend
  */
 
+// New clean contract ABI
+export const OmamoriNFTABI = [
+  {
+    "type": "constructor",
+    "inputs": [
+      { "name": "_initialOwner", "type": "address", "internalType": "address" },
+      { "name": "_royaltyRecipient", "type": "address", "internalType": "address" },
+      { "name": "_baseTokenURI", "type": "string", "internalType": "string" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "mint",
+    "inputs": [
+      { "name": "majorId", "type": "uint8", "internalType": "uint8" },
+      { "name": "minorId", "type": "uint8", "internalType": "uint8" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "getTokenData",
+    "inputs": [{ "name": "tokenId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{
+      "name": "",
+      "type": "tuple",
+      "internalType": "struct OmamoriNFT.TokenData",
+      "components": [
+        { "name": "majorId", "type": "uint8", "internalType": "uint8" },
+        { "name": "minorId", "type": "uint8", "internalType": "uint8" },
+        { "name": "materialId", "type": "uint16", "internalType": "uint16" },
+        { "name": "punchCount", "type": "uint8", "internalType": "uint8" },
+        { "name": "seed", "type": "uint64", "internalType": "uint64" },
+        { "name": "hypeBurned", "type": "uint120", "internalType": "uint120" }
+      ]
+    }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "tokenURI",
+    "inputs": [{ "name": "tokenId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "balanceOf",
+    "inputs": [{ "name": "owner", "type": "address", "internalType": "address" }],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "ownerOf",
+    "inputs": [{ "name": "tokenId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "name",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "symbol",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MIN_BURN",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "BURN_ADDRESS",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "HypeBurned",
+    "inputs": [
+      { "name": "burner", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "tokenId", "type": "uint256", "indexed": true, "internalType": "uint256" },
+      { "name": "amount", "type": "uint256", "indexed": false, "internalType": "uint256" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Transfer",
+    "inputs": [
+      { "name": "from", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "to", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "tokenId", "type": "uint256", "indexed": true, "internalType": "uint256" }
+    ],
+    "anonymous": false
+  }
+] as const;
+
 export const OmamoriNFTSecureABI = [
   // Read functions
   {

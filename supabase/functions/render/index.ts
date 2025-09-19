@@ -49,7 +49,7 @@ serve(async (req) => {
         method: 'eth_call',
         params: [{
           to: contractAddress,
-          data: `0xc0831416${Number(tokenId).toString(16).padStart(64, '0')}` // getTokenData(uint256)
+          data: `0x6352211e${Number(tokenId).toString(16).padStart(64, '0')}` // ownerOf(uint256) to check existence
         }, 'latest'],
         id: 1
       })
@@ -62,17 +62,43 @@ serve(async (req) => {
     }
 
     // Decode the result (6 values: seed, materialId, majorId, minorId, punchCount, hypeBurned)
-    const data = result.result
-    if (!data || data === '0x') {
+    const ownerResult = result.result
+    if (!ownerResult || ownerResult === '0x' || ownerResult === '0x0000000000000000000000000000000000000000') {
       throw new Error('Token does not exist')
     }
 
-    // Parse hex data (each value is 32 bytes)
-    const seed = BigInt('0x' + data.slice(2, 66))
-    const materialId = parseInt(data.slice(66, 130), 16)
-    const majorId = parseInt(data.slice(130, 194), 16)
-    const minorId = parseInt(data.slice(194, 258), 16)
-    const punchCount = parseInt(data.slice(258, 322), 16)
+    // Now fetch the actual token data using getTokenData
+    const tokenDataResponse = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_call',
+        params: [{
+          to: contractAddress,
+          data: `0x6b8ff574${Number(tokenId).toString(16).padStart(64, '0')}` // getTokenData(uint256)
+        }, 'latest'],
+        id: 2
+      })
+    })
+
+    const tokenDataResult = await tokenDataResponse.json()
+    
+    if (tokenDataResult.error) {
+      throw new Error(`Token data fetch failed: ${tokenDataResult.error.message}`)
+    }
+
+    const data = tokenDataResult.result
+    if (!data || data === '0x') {
+      throw new Error('Token data not found')
+    }
+
+    // Parse token data struct (6 fields, each 32 bytes)
+    const majorId = parseInt(data.slice(2, 66), 16)
+    const minorId = parseInt(data.slice(66, 130), 16)
+    const materialId = parseInt(data.slice(130, 194), 16)
+    const punchCount = parseInt(data.slice(194, 258), 16)
+    const seed = BigInt('0x' + data.slice(258, 322))
     const hypeBurned = BigInt('0x' + data.slice(322, 386))
 
     // Generate high-quality SVG
