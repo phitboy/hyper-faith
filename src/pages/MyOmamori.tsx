@@ -97,9 +97,10 @@ export default function MyOmamori() {
     }
   };
 
-  const formatHype = (wei: string) => {
-    const hype = parseFloat(wei) / 1e18;
-    return `${hype.toFixed(4)} HYPE`;
+  const formatHype = (hype: string) => {
+    // token.hypeBurned is already in HYPE format, not wei
+    const hyp = parseFloat(hype);
+    return `${hyp.toFixed(4)} HYPE`;
   };
 
   if (!isConnected) {

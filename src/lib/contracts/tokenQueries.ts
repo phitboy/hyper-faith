@@ -70,17 +70,21 @@ async function fetchTokenMetadata(tokenId: number, tokenURI: string): Promise<Om
  */
 export async function fetchUserTokens(userAddress: `0x${string}`): Promise<OmamoriToken[]> {
   try {
+    console.time('🔍 fetchUserTokens TOTAL')
     const tokens: OmamoriToken[] = []
     
     // OPTIMIZED: Use Transfer events to find user's tokens instead of brute force
     // This reduces from 400+ RPC calls to just a few calls
     
+    console.time('📡 Create RPC client')
     // Get Transfer events where 'to' is the user address
     const client = createPublicClient({
       chain: hyperEVM,
       transport: http()
     })
+    console.timeEnd('📡 Create RPC client')
     
+    console.time('📋 Get Transfer events')
     // Get Transfer events from contract deployment to now
     const logs = await client.getLogs({
       address: contractAddresses.OmamoriNFT,
@@ -98,13 +102,18 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
       },
       fromBlock: 'earliest'
     })
+    console.timeEnd('📋 Get Transfer events')
+    
+    console.log(`📊 Found ${logs.length} Transfer events`)
     
     // Extract token IDs from Transfer events
     const tokenIds = logs.map(log => Number(log.args.tokenId)).filter(id => id > 0)
     
     // Remove duplicates and sort
     const uniqueTokenIds = [...new Set(tokenIds)].sort((a, b) => b - a)
+    console.log(`🎯 User owns ${uniqueTokenIds.length} unique tokens: [${uniqueTokenIds.join(', ')}]`)
     
+    console.time('⚡ Parallel RPC calls')
     // OPTIMIZED: Batch all RPC calls in parallel instead of sequential
     const tokenPromises = uniqueTokenIds.map(async (tokenId) => {
       try {
@@ -164,6 +173,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
     
     // Wait for all tokens to be processed in parallel
     const tokenResults = await Promise.all(tokenPromises)
+    console.timeEnd('⚡ Parallel RPC calls')
     
     // Filter out null results and add to tokens array
     for (const token of tokenResults) {
@@ -172,6 +182,8 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
       }
     }
     
+    console.timeEnd('🔍 fetchUserTokens TOTAL')
+    console.log(`✅ Successfully fetched ${tokens.length} tokens`)
     return tokens // Already sorted by tokenId (most recent first)
     
   } catch (error) {
