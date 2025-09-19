@@ -6,6 +6,65 @@ import { parseTokenURI } from './realOmamori'
 import type { OmamoriToken } from './omamori'
 
 /**
+ * Fetch token metadata from URL (for new contract with off-chain metadata)
+ */
+async function fetchTokenMetadata(tokenId: number, tokenURI: string): Promise<OmamoriToken> {
+  try {
+    // If tokenURI is a URL, fetch the metadata
+    if (tokenURI.startsWith('http')) {
+      const response = await fetch(tokenURI)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch metadata: ${response.status}`)
+      }
+      const metadata = await response.json()
+      
+      // Parse metadata into OmamoriToken format
+      const attributes = metadata.attributes || []
+      const getAttributeValue = (traitType: string) => {
+        const attr = attributes.find((a: any) => a.trait_type === traitType)
+        return attr ? attr.value : undefined
+      }
+      
+      // Fetch the actual SVG content from the image URL
+      let imageSvg = ''
+      if (metadata.image && metadata.image.startsWith('http')) {
+        try {
+          const svgResponse = await fetch(metadata.image)
+          if (svgResponse.ok) {
+            imageSvg = await svgResponse.text()
+          }
+        } catch (error) {
+          console.warn(`Failed to fetch SVG for token ${tokenId}:`, error)
+          imageSvg = metadata.image // Fallback to URL
+        }
+      } else {
+        imageSvg = metadata.image || ''
+      }
+      
+      return {
+        tokenId,
+        majorId: parseInt(getAttributeValue('Major ID')) || 0,
+        minorId: parseInt(getAttributeValue('Minor ID')) || 0,
+        materialId: 0, // Will be filled from getTokenData
+        materialName: getAttributeValue('Material') || 'Unknown',
+        materialTier: getAttributeValue('Rarity Tier') || 'Common',
+        punchCount: parseInt(getAttributeValue('Punch Count')) || 0,
+        hypeBurned: getAttributeValue('HYPE Burned') || '0.0000',
+        seed: getAttributeValue('Seed') || '0x0',
+        imageSvg,
+        mintedAt: Date.now(),
+      } as OmamoriToken
+    } else {
+      // Fallback to old parsing method for embedded JSON
+      return parseTokenURI(tokenId, tokenURI)
+    }
+  } catch (error) {
+    console.error(`Failed to fetch metadata for token ${tokenId}:`, error)
+    throw error
+  }
+}
+
+/**
  * Fetch all tokens owned by a user (Off-Chain Rendering - simplified approach)
  * Note: Since off-chain contract doesn't have enumerable functions, we'll check known token IDs
  */
@@ -31,7 +90,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
     for (let tokenId = 1; tokenId <= maxTokenId; tokenId++) {
       try {
         const owner = await readContract(config, {
-          address: contractAddresses.OmamoriNFTOffChain,
+          address: contractAddresses.OmamoriNFT,
           abi: OmamoriNFTABI,
           functionName: 'ownerOf',
           args: [BigInt(tokenId)],
@@ -39,19 +98,19 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
         
         if ((owner as string).toLowerCase() === userAddress.toLowerCase()) {
           const tokenURI = await readContract(config, {
-            address: contractAddresses.OmamoriNFTOffChain,
+            address: contractAddresses.OmamoriNFT,
             abi: OmamoriNFTABI,
             functionName: 'tokenURI',
             args: [BigInt(tokenId)],
           } as any) // Cast to any to avoid strict typing issues
         
           if (tokenURI) {
-            const token = parseTokenURI(Number(tokenId), tokenURI as string)
+            const token = await fetchTokenMetadata(tokenId, tokenURI as string)
             
             // Get additional token data from getTokenData() for OmamoriNFTOffChain
             try {
               const tokenData = await readContract(config, {
-                address: contractAddresses.OmamoriNFTOffChain,
+                address: contractAddresses.OmamoriNFT,
                 abi: OmamoriNFTABI,
                 functionName: 'getTokenData',
                 args: [BigInt(tokenId)],
@@ -102,19 +161,19 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
     for (let tokenId = maxTokenId; tokenId >= 1 && tokens.length < limit; tokenId--) {
       try {
         const tokenURI = await readContract(config, {
-          address: contractAddresses.OmamoriNFTOffChain,
+          address: contractAddresses.OmamoriNFT,
           abi: OmamoriNFTABI,
           functionName: 'tokenURI',
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
         
                if (tokenURI) {
-                 const token = parseTokenURI(tokenId, tokenURI as string)
+                 const token = await fetchTokenMetadata(tokenId, tokenURI as string)
                  
                  // Get additional token data from getTokenData() for OmamoriNFTOffChain
                  try {
                    const tokenData = await readContract(config, {
-                     address: contractAddresses.OmamoriNFTOffChain,
+                     address: contractAddresses.OmamoriNFT,
                      abi: OmamoriNFTABI,
                      functionName: 'getTokenData',
                      args: [BigInt(tokenId)],
@@ -166,12 +225,12 @@ export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | nu
       return null
     }
     
-    const token = parseTokenURI(tokenId, tokenURI as string)
+    const token = await fetchTokenMetadata(tokenId, tokenURI as string)
     
     // Get additional token data from getTokenData() for OmamoriNFTOffChain
     try {
       const tokenData = await readContract(config, {
-        address: contractAddresses.OmamoriNFTOffChain,
+        address: contractAddresses.OmamoriNFT,
             abi: OmamoriNFTABI,
         functionName: 'getTokenData',
         args: [BigInt(tokenId)],
