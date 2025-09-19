@@ -38,7 +38,7 @@ export const config = getDefaultConfig({
  */
 export const contractAddresses = {
   // NEW: Off-chain rendering contract with Supabase Edge Functions
-  OmamoriNFTOffChain: '0xD9983b701D46c04349856E30a9F7108cBe24f6Aa' as const,
+  OmamoriNFTOffChain: '0x0381aB7E76fD637bdb2a37D627C2065029F1aa77' as const,
   
   // Previous versions (for reference)
   OmamoriNFTSingle: '0xb4427574AC7941528b413AEDDC435B774040F518' as const,
