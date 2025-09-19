@@ -105,61 +105,70 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
     // Remove duplicates and sort
     const uniqueTokenIds = [...new Set(tokenIds)].sort((a, b) => b - a)
     
-    // Now fetch metadata for each token the user owns
-    for (const tokenId of uniqueTokenIds) {
+    // OPTIMIZED: Batch all RPC calls in parallel instead of sequential
+    const tokenPromises = uniqueTokenIds.map(async (tokenId) => {
       try {
-        // Verify user still owns the token (in case of transfers)
-        const owner = await readContract(config, {
-          address: contractAddresses.OmamoriNFT,
-          abi: OmamoriNFTABI,
-          functionName: 'ownerOf',
-          args: [BigInt(tokenId)],
-        } as any)
+        // Batch all 3 contract calls in parallel for this token
+        const [owner, tokenURI, tokenData] = await Promise.all([
+          readContract(config, {
+            address: contractAddresses.OmamoriNFT,
+            abi: OmamoriNFTABI,
+            functionName: 'ownerOf',
+            args: [BigInt(tokenId)],
+          } as any),
+          readContract(config, {
+            address: contractAddresses.OmamoriNFT,
+            abi: OmamoriNFTABI,
+            functionName: 'tokenURI',
+            args: [BigInt(tokenId)],
+          } as any),
+          readContract(config, {
+            address: contractAddresses.OmamoriNFT,
+            abi: OmamoriNFTABI,
+            functionName: 'getTokenData',
+            args: [BigInt(tokenId)],
+          } as any)
+        ])
         
+        // Verify user still owns the token
         if ((owner as string).toLowerCase() !== userAddress.toLowerCase()) {
-          continue // User no longer owns this token
+          return null // User no longer owns this token
         }
         
-        const tokenURI = await readContract(config, {
-          address: contractAddresses.OmamoriNFT,
-          abi: OmamoriNFTABI,
-          functionName: 'tokenURI',
-          args: [BigInt(tokenId)],
-        } as any)
-      
-        if (tokenURI) {
-          const token = await fetchTokenMetadata(tokenId, tokenURI as string)
-          
-          // Get additional token data from getTokenData()
-          try {
-            const tokenData = await readContract(config, {
-              address: contractAddresses.OmamoriNFT,
-              abi: OmamoriNFTABI,
-              functionName: 'getTokenData',
-              args: [BigInt(tokenId)],
-            } as any)
-            
-            if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
-              // Update token with data from getTokenData (new contract structure)
-              token.majorId = Number(tokenData[0]) // majorId (uint8)
-              token.minorId = Number(tokenData[1]) // minorId (uint8)
-              token.materialId = Number(tokenData[2]) // materialId (uint16)
-              token.punchCount = Number(tokenData[3]) // punchCount (uint8)
-              token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
-              // Convert hypeBurned from wei to HYPE (divide by 1e18)
-              const hypeBurnedWei = BigInt(tokenData[5])
-              const hypeBurnedHype = Number(hypeBurnedWei) / 1e18
-              token.hypeBurned = hypeBurnedHype.toFixed(4) // hypeBurned (uint120)
-            }
-          } catch (error) {
-            console.warn(`Failed to get token data for token ${tokenId}:`, error)
-          }
-          
-          tokens.push(token)
+        if (!tokenURI) {
+          return null
         }
+        
+        // Fetch metadata (this is also async but we can't batch it)
+        const token = await fetchTokenMetadata(tokenId, tokenURI as string)
+        
+        // Update token with contract data
+        if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
+          token.majorId = Number(tokenData[0]) // majorId (uint8)
+          token.minorId = Number(tokenData[1]) // minorId (uint8)
+          token.materialId = Number(tokenData[2]) // materialId (uint16)
+          token.punchCount = Number(tokenData[3]) // punchCount (uint8)
+          token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
+          // Convert hypeBurned from wei to HYPE (divide by 1e18)
+          const hypeBurnedWei = BigInt(tokenData[5])
+          const hypeBurnedHype = Number(hypeBurnedWei) / 1e18
+          token.hypeBurned = hypeBurnedHype.toFixed(4) // hypeBurned (uint120)
+        }
+        
+        return token
       } catch (error) {
         console.warn(`Failed to fetch token ${tokenId}:`, error)
-        continue
+        return null
+      }
+    })
+    
+    // Wait for all tokens to be processed in parallel
+    const tokenResults = await Promise.all(tokenPromises)
+    
+    // Filter out null results and add to tokens array
+    for (const token of tokenResults) {
+      if (token) {
+        tokens.push(token)
       }
     }
     

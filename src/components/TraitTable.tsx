@@ -11,9 +11,10 @@ export function TraitTable({ token, className = "" }: TraitTableProps) {
   const major = majorsData[token.majorId];
   const minor = major?.minors[token.minorId];
   
-  const formatHype = (wei: string) => {
-    const hype = parseFloat(wei) / 1e18;
-    return `${hype.toFixed(4)} HYPE`;
+  const formatHype = (hype: string) => {
+    // token.hypeBurned is already in HYPE format, not wei
+    const hyp = parseFloat(hype);
+    return `${hyp.toFixed(4)} HYPE`;
   };
 
   const formatDate = (timestamp: number) => {
