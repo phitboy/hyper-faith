@@ -1,9 +1,11 @@
 import { readContract } from 'wagmi/actions'
+import { createPublicClient, http } from 'viem'
 import { config } from '@/lib/wagmi'
 import { contractAddresses } from '@/lib/wagmi'
 import { OmamoriNFTABI } from './abis'
 import { parseTokenURI } from './realOmamori'
 import type { OmamoriToken } from './omamori'
+import { hyperEVM } from '@/lib/chains'
 
 /**
  * Fetch token metadata from URL (for new contract with off-chain metadata)
@@ -68,22 +70,113 @@ async function fetchTokenMetadata(tokenId: number, tokenURI: string): Promise<Om
  */
 export async function fetchUserTokens(userAddress: `0x${string}`): Promise<OmamoriToken[]> {
   try {
-    // Get user's token balance
-    const balance = await readContract(config, {
-      address: contractAddresses.OmamoriNFT,
-      abi: OmamoriNFTABI,
-      functionName: 'balanceOf',
-      args: [userAddress],
-    } as any) // Cast to any to avoid strict typing issues
+    const tokens: OmamoriToken[] = []
     
-    if (!balance || balance === 0n) {
-      return []
+    // OPTIMIZED: Use Transfer events to find user's tokens instead of brute force
+    // This reduces from 400+ RPC calls to just a few calls
+    
+    // Get Transfer events where 'to' is the user address
+    const client = createPublicClient({
+      chain: hyperEVM,
+      transport: http()
+    })
+    
+    // Get Transfer events from contract deployment to now
+    const logs = await client.getLogs({
+      address: contractAddresses.OmamoriNFT,
+      event: {
+        type: 'event',
+        name: 'Transfer',
+        inputs: [
+          { name: 'from', type: 'address', indexed: true },
+          { name: 'to', type: 'address', indexed: true },
+          { name: 'tokenId', type: 'uint256', indexed: true }
+        ]
+      },
+      args: {
+        to: userAddress
+      },
+      fromBlock: 'earliest'
+    })
+    
+    // Extract token IDs from Transfer events
+    const tokenIds = logs.map(log => Number(log.args.tokenId)).filter(id => id > 0)
+    
+    // Remove duplicates and sort
+    const uniqueTokenIds = [...new Set(tokenIds)].sort((a, b) => b - a)
+    
+    // Now fetch metadata for each token the user owns
+    for (const tokenId of uniqueTokenIds) {
+      try {
+        // Verify user still owns the token (in case of transfers)
+        const owner = await readContract(config, {
+          address: contractAddresses.OmamoriNFT,
+          abi: OmamoriNFTABI,
+          functionName: 'ownerOf',
+          args: [BigInt(tokenId)],
+        } as any)
+        
+        if ((owner as string).toLowerCase() !== userAddress.toLowerCase()) {
+          continue // User no longer owns this token
+        }
+        
+        const tokenURI = await readContract(config, {
+          address: contractAddresses.OmamoriNFT,
+          abi: OmamoriNFTABI,
+          functionName: 'tokenURI',
+          args: [BigInt(tokenId)],
+        } as any)
+      
+        if (tokenURI) {
+          const token = await fetchTokenMetadata(tokenId, tokenURI as string)
+          
+          // Get additional token data from getTokenData()
+          try {
+            const tokenData = await readContract(config, {
+              address: contractAddresses.OmamoriNFT,
+              abi: OmamoriNFTABI,
+              functionName: 'getTokenData',
+              args: [BigInt(tokenId)],
+            } as any)
+            
+            if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
+              // Update token with data from getTokenData (new contract structure)
+              token.majorId = Number(tokenData[0]) // majorId (uint8)
+              token.minorId = Number(tokenData[1]) // minorId (uint8)
+              token.materialId = Number(tokenData[2]) // materialId (uint16)
+              token.punchCount = Number(tokenData[3]) // punchCount (uint8)
+              token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
+              // Convert hypeBurned from wei to HYPE (divide by 1e18)
+              const hypeBurnedWei = BigInt(tokenData[5])
+              const hypeBurnedHype = Number(hypeBurnedWei) / 1e18
+              token.hypeBurned = hypeBurnedHype.toFixed(4) // hypeBurned (uint120)
+            }
+          } catch (error) {
+            console.warn(`Failed to get token data for token ${tokenId}:`, error)
+          }
+          
+          tokens.push(token)
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch token ${tokenId}:`, error)
+        continue
+      }
     }
     
-    // Since we don't have enumerable functions, we'll check token IDs 1-100 for now
-    // In a production app, you'd want to track this via events or a subgraph
+    return tokens // Already sorted by tokenId (most recent first)
+    
+  } catch (error) {
+    console.error('Failed to fetch user tokens:', error)
+    // Fallback to old method if events fail
+    return fetchUserTokensFallback(userAddress)
+  }
+}
+
+// Fallback method (original brute force approach, but limited to 20 tokens)
+async function fetchUserTokensFallback(userAddress: `0x${string}`): Promise<OmamoriToken[]> {
+  try {
     const tokens: OmamoriToken[] = []
-    const maxTokenId = 100 // Check first 100 tokens
+    const maxTokenId = 20 // Reduced from 100 for faster fallback
     
     for (let tokenId = 1; tokenId <= maxTokenId; tokenId++) {
       try {
@@ -92,7 +185,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
           abi: OmamoriNFTABI,
           functionName: 'ownerOf',
           args: [BigInt(tokenId)],
-        } as any) // Cast to any to avoid strict typing issues
+        } as any)
         
         if ((owner as string).toLowerCase() === userAddress.toLowerCase()) {
           const tokenURI = await readContract(config, {
@@ -100,12 +193,11 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
             abi: OmamoriNFTABI,
             functionName: 'tokenURI',
             args: [BigInt(tokenId)],
-          } as any) // Cast to any to avoid strict typing issues
+          } as any)
         
           if (tokenURI) {
             const token = await fetchTokenMetadata(tokenId, tokenURI as string)
             
-            // Get additional token data from getTokenData() for OmamoriNFTOffChain
             try {
               const tokenData = await readContract(config, {
                 address: contractAddresses.OmamoriNFT,
@@ -115,13 +207,14 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
               } as any)
               
               if (tokenData && Array.isArray(tokenData) && tokenData.length >= 6) {
-                // Update token with data from getTokenData (new contract structure)
-                token.majorId = Number(tokenData[0]) // majorId (uint8)
-                token.minorId = Number(tokenData[1]) // minorId (uint8)
-                token.materialId = Number(tokenData[2]) // materialId (uint16)
-                token.punchCount = Number(tokenData[3]) // punchCount (uint8)
-                token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
-                token.hypeBurned = tokenData[5].toString() // hypeBurned (uint120)
+                token.majorId = Number(tokenData[0])
+                token.minorId = Number(tokenData[1])
+                token.materialId = Number(tokenData[2])
+                token.punchCount = Number(tokenData[3])
+                token.seed = `0x${tokenData[4].toString(16)}`
+                const hypeBurnedWei = BigInt(tokenData[5])
+                const hypeBurnedHype = Number(hypeBurnedWei) / 1e18
+                token.hypeBurned = hypeBurnedHype.toFixed(4)
               }
             } catch (error) {
               console.warn(`Failed to get token data for token ${tokenId}:`, error)
@@ -131,16 +224,13 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
           }
         }
       } catch (error) {
-        // Token doesn't exist or not owned by user, continue
         continue
       }
     }
     
-    // Sort by token ID (most recent first)
     return tokens.sort((a, b) => b.tokenId - a.tokenId)
-    
   } catch (error) {
-    console.error('Failed to fetch user tokens:', error)
+    console.error('Failed to fetch user tokens (fallback):', error)
     return []
   }
 }
@@ -184,7 +274,10 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
                      token.materialId = Number(tokenData[2]) // materialId (uint16)
                      token.punchCount = Number(tokenData[3]) // punchCount (uint8)
                      token.seed = `0x${tokenData[4].toString(16)}` // seed (uint64)
-                     token.hypeBurned = tokenData[5].toString() // hypeBurned (uint120)
+                     // Convert hypeBurned from wei to HYPE (divide by 1e18)
+                const hypeBurnedWei = BigInt(tokenData[5])
+                const hypeBurnedHype = Number(hypeBurnedWei) / 1e18
+                token.hypeBurned = hypeBurnedHype.toFixed(4) // hypeBurned (uint120)
                    }
                  } catch (error) {
                    console.warn(`Failed to get token data for token ${tokenId}:`, error)
