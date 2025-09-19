@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { generateMetadata } from "../_shared/renderer.ts"
+import { generateMetadata, generateOmamoriSVG } from "../_shared/renderer.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,8 +87,10 @@ serve(async (req) => {
       hypeBurned
     )
 
-    // Update image URL to point to our render endpoint
-    metadata.image = `${baseUrl}/functions/v1/render/${tokenId}`
+    // Generate SVG and encode as base64 data URI
+    const svg = generateOmamoriSVG(seed, materialId, majorId, minorId, punchCount, hypeBurned)
+    const base64Svg = btoa(svg)
+    metadata.image = `data:image/svg+xml;base64,${base64Svg}`
 
     return new Response(JSON.stringify(metadata), {
       headers: {

@@ -25,9 +25,19 @@ async function fetchTokenMetadata(tokenId: number, tokenURI: string): Promise<Om
         return attr ? attr.value : undefined
       }
       
-      // For now, just use the SVG URL directly instead of fetching content
-      // The frontend can display this as an iframe or img tag
-      const imageSvg = metadata.image || ''
+      // Handle different image formats
+      let imageSvg = metadata.image || ''
+      
+      // If it's a base64 data URI, decode it to get the actual SVG content
+      if (imageSvg.startsWith('data:image/svg+xml;base64,')) {
+        try {
+          const base64Data = imageSvg.split(',')[1]
+          imageSvg = atob(base64Data)
+        } catch (error) {
+          console.warn(`Failed to decode base64 SVG for token ${tokenId}:`, error)
+          // Keep the data URI as fallback
+        }
+      }
       
       return {
         tokenId,
