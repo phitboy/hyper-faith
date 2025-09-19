@@ -7,17 +7,25 @@ import type { OmamoriToken } from './omamori'
  */
 export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
   try {
-    // TokenURI format: "data:application/json;base64,{base64_encoded_json}"
+    // TokenURI format: "data:application/json,{json}" or "data:application/json;base64,{base64_encoded_json}"
     if (!tokenURI || !tokenURI.includes(',')) {
       throw new Error('Invalid tokenURI format')
     }
     
-    const base64Json = tokenURI.split(',')[1]
-    if (!base64Json) {
-      throw new Error('No base64 data found in tokenURI')
+    const [prefix, data] = tokenURI.split(',', 2)
+    if (!data) {
+      throw new Error('No data found in tokenURI')
     }
     
-    const jsonString = atob(base64Json)
+    let jsonString: string
+    if (prefix.includes('base64')) {
+      // Base64 encoded JSON
+      jsonString = atob(data)
+    } else {
+      // Plain JSON
+      jsonString = decodeURIComponent(data)
+    }
+    
     const metadata = JSON.parse(jsonString)
     
     // Extract attributes from metadata

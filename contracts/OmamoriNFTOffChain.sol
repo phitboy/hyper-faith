@@ -239,8 +239,8 @@ contract OmamoriNFTOffChain is ERC721, Ownable, IERC2981 {
         ));
         
         return string(abi.encodePacked(
-            "data:application/json;base64,",
-            _base64Encode(bytes(json))
+            "data:application/json,",
+            json
         ));
     }
     
