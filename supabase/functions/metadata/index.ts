@@ -50,7 +50,7 @@ serve(async (req) => {
         method: 'eth_call',
         params: [{
           to: contractAddress,
-          data: `0xc0831416${Number(tokenId).toString(16).padStart(64, '0')}` // getTokenData(uint256)
+          data: `0xb09afec1${Number(tokenId).toString(16).padStart(64, '0')}` // getTokenData(uint256)
         }, 'latest'],
         id: 1
       })
