@@ -328,67 +328,101 @@ contract OmamoriNFTSingle is ERC721, Ownable, IERC2981 {
      * @notice Render major glyph (matching website arcanum)
      */
     function _renderMajorGlyph(uint8 majorId, string memory color) internal pure returns (string memory) {
-        if (majorId == 0) { // Liquidity — three pillars
+        if (majorId == 0) { // Liquidity - flowing water pattern
             return string(abi.encodePacked(
-                '<line x1="260" y1="360" x2="260" y2="520" stroke="', color, '" stroke-width="6"/>',
-                '<line x1="300" y1="360" x2="300" y2="520" stroke="', color, '" stroke-width="6"/>',
-                '<line x1="340" y1="360" x2="340" y2="520" stroke="', color, '" stroke-width="6"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M-40,-60 L-40,-40 L40,-40 L40,-20 L-40,-20 L-40,0 L40,0 L40,20 L-40,20 L-40,40 L40,40 L40,60" fill="none" stroke="', color, '" stroke-width="6"/>',
+                '<circle cx="0" cy="0" r="8" fill="', color, '"/>',
+                '</g>'
             ));
-        } else if (majorId == 1) { // Leverage — lever + fulcrum
+        } else if (majorId == 1) { // Leverage - pyramid/triangle
             return string(abi.encodePacked(
-                '<line x1="230" y1="540" x2="360" y2="410" stroke="', color, '" stroke-width="6"/>',
-                '<circle cx="285" cy="540" r="6" fill="', color, '"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M0,-60 L-50,60 L50,60 Z" fill="none" stroke="', color, '" stroke-width="6"/>',
+                '<rect x="-20" y="-20" width="40" height="40" fill="', color, '" opacity="0.5"/>',
+                '<path d="M0,-60 L0,60" stroke="', color, '" stroke-width="4"/>',
+                '</g>'
             ));
-        } else if (majorId == 2) { // Volatility — zigzag bolt
+        } else if (majorId == 2) { // Volatility - wave pattern
             return string(abi.encodePacked(
-                '<polyline points="230,420 280,470 255,495 320,560 360,520" stroke="', color, '" stroke-width="6" fill="none"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M-60,0 Q-30,-40 0,0 Q30,40 60,0" fill="none" stroke="', color, '" stroke-width="6"/>',
+                '<path d="M-60,20 Q-30,-20 0,20 Q30,60 60,20" fill="none" stroke="', color, '" stroke-width="4"/>',
+                '<circle cx="0" cy="0" r="12" fill="', color, '"/>',
+                '</g>'
             ));
-        } else if (majorId == 3) { // Narrative — spiral-ish scroll
+        } else if (majorId == 3) { // Narrative - diamond pattern
             return string(abi.encodePacked(
-                '<circle cx="300" cy="470" r="38" stroke="', color, '" stroke-width="6" fill="none"/>',
-                '<circle cx="300" cy="480" r="16" stroke="', color, '" stroke-width="6" fill="none"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M0,-50 L35,-25 L0,0 L-35,-25 Z" fill="none" stroke="', color, '" stroke-width="4"/>',
+                '<path d="M0,0 L35,25 L0,50 L-35,25 Z" fill="', color, '" opacity="0.3"/>',
+                '<circle cx="0" cy="0" r="8" fill="', color, '"/>',
+                '</g>'
             ));
-        } else if (majorId == 4) { // The Macro — world axis
+        } else if (majorId == 4) { // The Macro - large encompassing shape
             return string(abi.encodePacked(
-                '<circle cx="300" cy="470" r="70" stroke="', color, '" stroke-width="6" fill="none"/>',
-                '<line x1="300" y1="400" x2="300" y2="540" stroke="', color, '" stroke-width="6"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M-60,-40 L0,-60 L60,-40 L60,40 L0,60 L-60,40 Z" fill="none" stroke="', color, '" stroke-width="6"/>',
+                '<rect x="-30" y="-30" width="60" height="60" fill="', color, '" opacity="0.2"/>',
+                '</g>'
             ));
-        } else if (majorId == 5) { // Discipline — frame
+        } else if (majorId == 5) { // Discipline - structured lines
             return string(abi.encodePacked(
-                '<rect x="230" y="390" width="140" height="140" rx="4" ry="4" stroke="', color, '" stroke-width="6" fill="none"/>'
+                '<g transform="translate(300,400)">',
+                '<rect x="-50" y="-30" width="100" height="8" fill="', color, '"/>',
+                '<rect x="-6" y="-50" width="12" height="100" fill="', color, '"/>',
+                '<path d="M-50,0 L50,0 M0,-50 L0,50" stroke="', color, '" stroke-width="4"/>',
+                '</g>'
             ));
-        } else if (majorId == 6) { // FOMO — up triangle
+        } else if (majorId == 6) { // FOMO - urgent arrows
             return string(abi.encodePacked(
-                '<polygon points="300,380 255,560 345,560" stroke="', color, '" stroke-width="6" fill="none"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M-40,-40 L0,-60 L40,-40 L20,-40 L20,40 L-20,40 L-20,-40 Z" fill="', color, '" opacity="0.7"/>',
+                '<path d="M0,-60 L0,60" stroke="', color, '" stroke-width="6"/>',
+                '</g>'
             ));
-        } else if (majorId == 7) { // FUD — down triangle
+        } else if (majorId == 7) { // FUD - cloud/storm pattern
             return string(abi.encodePacked(
-                '<polygon points="300,560 255,380 345,380" stroke="', color, '" stroke-width="6" fill="none"/>'
+                '<g transform="translate(300,400)">',
+                '<ellipse cx="-20" cy="-30" rx="25" ry="15" fill="', color, '" opacity="0.4"/>',
+                '<ellipse cx="20" cy="-30" rx="25" ry="15" fill="', color, '" opacity="0.4"/>',
+                '<ellipse cx="0" cy="-15" rx="30" ry="20" fill="', color, '" opacity="0.6"/>',
+                '<path d="M-10,10 L-5,30 M0,10 L0,35 M10,10 L15,30" stroke="', color, '" stroke-width="3"/>',
+                '</g>'
             ));
-        } else if (majorId == 8) { // RNG — braille cell (2x3)
+        } else if (majorId == 8) { // RNG - question marks/randomness
             return string(abi.encodePacked(
-                '<circle cx="270" cy="430" r="7" fill="', color, '"/>',
-                '<circle cx="330" cy="430" r="7" fill="', color, '"/>',
-                '<circle cx="270" cy="470" r="7" fill="', color, '"/>',
-                '<circle cx="330" cy="470" r="7" fill="', color, '"/>',
-                '<circle cx="270" cy="510" r="7" fill="', color, '"/>',
-                '<circle cx="330" cy="510" r="7" fill="', color, '"/>'
+                '<g transform="translate(300,400)">',
+                '<circle cx="0" cy="0" r="40" fill="none" stroke="', color, '" stroke-width="4" stroke-dasharray="10,5"/>',
+                '<text x="0" y="10" text-anchor="middle" font-size="40" fill="', color, '">?</text>',
+                '<circle cx="-25" cy="-25" r="5" fill="', color, '"/>',
+                '<circle cx="25" cy="25" r="5" fill="', color, '"/>',
+                '</g>'
             ));
-        } else if (majorId == 9) { // Max Pain — X cross
+        } else if (majorId == 9) { // Max Pain - X pattern
             return string(abi.encodePacked(
-                '<line x1="240" y1="410" x2="360" y2="530" stroke="', color, '" stroke-width="6"/>',
-                '<line x1="360" y1="410" x2="240" y2="530" stroke="', color, '" stroke-width="6"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M-40,-40 L40,40 M40,-40 L-40,40" stroke="', color, '" stroke-width="8"/>',
+                '<circle cx="0" cy="0" r="20" fill="', color, '" opacity="0.3"/>',
+                '<path d="M-20,-20 L20,20 M20,-20 L-20,20" stroke="', color, '" stroke-width="4"/>',
+                '</g>'
             ));
-        } else if (majorId == 10) { // The Chat — signal bars + ping
+        } else if (majorId == 10) { // The Chat - dots/ellipsis
             return string(abi.encodePacked(
-                '<circle cx="300" cy="400" r="6" fill="', color, '"/>',
-                '<line x1="250" y1="460" x2="350" y2="460" stroke="', color, '" stroke-width="8"/>',
-                '<line x1="250" y1="500" x2="350" y2="500" stroke="', color, '" stroke-width="6"/>'
+                '<g transform="translate(300,400)">',
+                '<circle cx="-30" cy="0" r="8" fill="', color, '"/>',
+                '<circle cx="0" cy="0" r="8" fill="', color, '"/>',
+                '<circle cx="30" cy="0" r="8" fill="', color, '"/>',
+                '<rect x="-50" y="-30" width="100" height="60" fill="none" stroke="', color, '" stroke-width="3" rx="10"/>',
+                '</g>'
             ));
-        } else { // Ego — lozenge eye + pupil (majorId == 11)
+        } else { // Ego (majorId == 11) - house/self symbol
             return string(abi.encodePacked(
-                '<polygon points="300,410 360,470 300,530 240,470" stroke="', color, '" stroke-width="6" fill="none"/>',
-                '<circle cx="300" cy="470" r="8" fill="', color, '"/>'
+                '<g transform="translate(300,400)">',
+                '<path d="M0,-50 L-40,0 L-20,0 L-20,40 L20,40 L20,0 L40,0 Z" fill="', color, '" opacity="0.6"/>',
+                '<rect x="-20" y="0" width="40" height="40" fill="', color, '"/>',
+                '<path d="M0,-50 L-40,0 L40,0 Z" fill="none" stroke="', color, '" stroke-width="4"/>',
+                '</g>'
             ));
         }
     }
@@ -396,38 +430,35 @@ contract OmamoriNFTSingle is ERC721, Ownable, IERC2981 {
     /**
      * @notice Render minor glyph (positioned in bottom right)
      */
-    function _renderMinorGlyph(uint8 majorId, uint8 minorId, string memory color) internal pure returns (string memory) {
-        if (majorId == 1) { // Leverage: Margin, Liqd, Max Long, Max Short
-            if (minorId == 0) { // Margin: higher fulcrum
-                return string(abi.encodePacked(
-                    '<line x1="710" y1="1120" x2="850" y2="1000" stroke="', color, '" stroke-width="6"/>',
-                    '<circle cx="780" cy="1090" r="6" fill="', color, '"/>'
-                ));
-            } else if (minorId == 1) { // Liqd: blade at tip
-                return string(abi.encodePacked(
-                    '<line x1="710" y1="1120" x2="850" y2="1000" stroke="', color, '" stroke-width="6"/>',
-                    '<polygon points="850,1000 862,992 862,1008" stroke="', color, '" stroke-width="6" fill="', color, '"/>',
-                    '<circle cx="780" cy="1120" r="6" fill="', color, '"/>'
-                ));
-            } else if (minorId == 2) { // Max Long: steeper up
-                return string(abi.encodePacked(
-                    '<line x1="710" y1="1140" x2="860" y2="980" stroke="', color, '" stroke-width="6"/>',
-                    '<circle cx="780" cy="1140" r="6" fill="', color, '"/>'
-                ));
-            } else { // Max Short: down
-                return string(abi.encodePacked(
-                    '<line x1="710" y1="1000" x2="860" y2="1140" stroke="', color, '" stroke-width="6"/>',
-                    '<circle cx="780" cy="1000" r="6" fill="', color, '"/>'
-                ));
-            }
-        }
+    function _renderMinorGlyph(uint8 /* majorId */, uint8 minorId, string memory color) internal pure returns (string memory) {
+        // Position in bottom right area
+        string memory transform = 'transform="translate(750,1050)"';
         
-        // Default fallback for other majors (simplified for now)
-        return string(abi.encodePacked(
-            '<g transform="translate(750,1050)">',
-            '<path d="M-20,20 L0,-20 L20,20" fill="', color, '"/>',
-            '</g>'
-        ));
+        if (minorId == 0) { // Bullish
+            return string(abi.encodePacked(
+                '<g ', transform, '>',
+                '<path d="M-20,20 L0,-20 L20,20" fill="', color, '"/>',
+                '</g>'
+            ));
+        } else if (minorId == 1) { // Bearish
+            return string(abi.encodePacked(
+                '<g ', transform, '>',
+                '<path d="M-20,-20 L0,20 L20,-20" fill="', color, '"/>',
+                '</g>'
+            ));
+        } else if (minorId == 2) { // Neutral
+            return string(abi.encodePacked(
+                '<g ', transform, '>',
+                '<rect x="-20" y="-5" width="40" height="10" fill="', color, '"/>',
+                '</g>'
+            ));
+        } else { // Uncertain (minorId == 3)
+            return string(abi.encodePacked(
+                '<g ', transform, '>',
+                '<circle cx="0" cy="0" r="15" fill="none" stroke="', color, '" stroke-width="3" stroke-dasharray="5,5"/>',
+                '</g>'
+            ));
+        }
     }
     
     /**

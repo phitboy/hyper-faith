@@ -278,6 +278,9 @@ export const OmamoriNFTSingleABI = [
   },
 ] as const
 
+// OmamoriNFTOffChain uses the same ABI as OmamoriNFTSingle
+export const OmamoriNFTOffChainABI = OmamoriNFTSingleABI
+
 export const MaterialRegistryABI = [
   {
     inputs: [{ name: "id", type: "uint16" }],

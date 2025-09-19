@@ -3,7 +3,7 @@ import type { OmamoriToken } from './omamori'
 
 /**
  * Parse tokenURI response from contract into OmamoriToken
- * Updated to handle OmamoriNFTSingle contract format
+ * Updated to handle OmamoriNFTOffChain contract format with Supabase Edge Functions
  */
 export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
   try {
@@ -27,9 +27,10 @@ export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
       return attr ? attr.value : undefined
     }
     
-    // Parse image (SVG is base64 encoded)
+    // Parse image (URL to Supabase Edge Function for off-chain rendering)
     let imageSvg = ''
     if (metadata.image?.startsWith('data:image/svg+xml;base64,')) {
+      // Legacy: base64-encoded SVG (for backward compatibility)
       try {
         imageSvg = atob(metadata.image.split(',')[1])
       } catch (error) {
@@ -37,10 +38,11 @@ export function parseTokenURI(tokenId: number, tokenURI: string): OmamoriToken {
         imageSvg = metadata.image || ''
       }
     } else {
+      // New: URL to Supabase Edge Function
       imageSvg = metadata.image || ''
     }
     
-    // Handle OmamoriNFTSingle format (missing Major ID, Minor ID, Punches, Seed)
+    // Handle OmamoriNFTOffChain format (missing Major ID, Minor ID, Punches, Seed)
     // These will be filled by getTokenData() in tokenQueries.ts
     const hypeBurnedValue = getAttributeValue('HYPE Burned')
     const hypeBurnedFormatted = hypeBurnedValue ? 

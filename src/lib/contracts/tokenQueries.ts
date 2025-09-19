@@ -1,20 +1,20 @@
 import { readContract } from 'wagmi/actions'
 import { config } from '@/lib/wagmi'
 import { contractAddresses } from '@/lib/wagmi'
-import { OmamoriNFTSingleABI } from './abis'
+import { OmamoriNFTOffChainABI } from './abis'
 import { parseTokenURI } from './realOmamori'
 import type { OmamoriToken } from './omamori'
 
 /**
- * Fetch all tokens owned by a user (Single Contract - simplified approach)
- * Note: Since single contract doesn't have enumerable functions, we'll check known token IDs
+ * Fetch all tokens owned by a user (Off-Chain Rendering - simplified approach)
+ * Note: Since off-chain contract doesn't have enumerable functions, we'll check known token IDs
  */
 export async function fetchUserTokens(userAddress: `0x${string}`): Promise<OmamoriToken[]> {
   try {
     // Get user's token balance
     const balance = await readContract(config, {
-      address: contractAddresses.OmamoriNFTSingle,
-      abi: OmamoriNFTSingleABI,
+      address: contractAddresses.OmamoriNFTOffChain,
+      abi: OmamoriNFTOffChainABI,
       functionName: 'balanceOf',
       args: [userAddress],
     } as any) // Cast to any to avoid strict typing issues
@@ -31,16 +31,16 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
     for (let tokenId = 1; tokenId <= maxTokenId; tokenId++) {
       try {
         const owner = await readContract(config, {
-          address: contractAddresses.OmamoriNFTSingle,
-          abi: OmamoriNFTSingleABI,
+          address: contractAddresses.OmamoriNFTOffChain,
+          abi: OmamoriNFTOffChainABI,
           functionName: 'ownerOf',
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
         
         if ((owner as string).toLowerCase() === userAddress.toLowerCase()) {
           const tokenURI = await readContract(config, {
-            address: contractAddresses.OmamoriNFTSingle,
-            abi: OmamoriNFTSingleABI,
+            address: contractAddresses.OmamoriNFTOffChain,
+            abi: OmamoriNFTOffChainABI,
             functionName: 'tokenURI',
             args: [BigInt(tokenId)],
           } as any) // Cast to any to avoid strict typing issues
@@ -48,11 +48,11 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
           if (tokenURI) {
             const token = parseTokenURI(Number(tokenId), tokenURI as string)
             
-            // Get additional token data from getTokenData() for OmamoriNFTSingle
+            // Get additional token data from getTokenData() for OmamoriNFTOffChain
             try {
               const tokenData = await readContract(config, {
-                address: contractAddresses.OmamoriNFTSingle,
-                abi: OmamoriNFTSingleABI,
+                address: contractAddresses.OmamoriNFTOffChain,
+                abi: OmamoriNFTOffChainABI,
                 functionName: 'getTokenData',
                 args: [BigInt(tokenId)],
               } as any)
@@ -89,7 +89,7 @@ export async function fetchUserTokens(userAddress: `0x${string}`): Promise<Omamo
 }
 
 /**
- * Fetch recent tokens for exploration (Single Contract - simplified approach)
+ * Fetch recent tokens for exploration (Off-Chain Rendering - simplified approach)
  */
 export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToken[]> {
   try {
@@ -102,8 +102,8 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
     for (let tokenId = maxTokenId; tokenId >= 1 && tokens.length < limit; tokenId--) {
       try {
         const tokenURI = await readContract(config, {
-          address: contractAddresses.OmamoriNFTSingle,
-          abi: OmamoriNFTSingleABI,
+          address: contractAddresses.OmamoriNFTOffChain,
+          abi: OmamoriNFTOffChainABI,
           functionName: 'tokenURI',
           args: [BigInt(tokenId)],
         } as any) // Cast to any to avoid strict typing issues
@@ -111,11 +111,11 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
                if (tokenURI) {
                  const token = parseTokenURI(tokenId, tokenURI as string)
                  
-                 // Get additional token data from getTokenData() for OmamoriNFTSingle
+                 // Get additional token data from getTokenData() for OmamoriNFTOffChain
                  try {
                    const tokenData = await readContract(config, {
-                     address: contractAddresses.OmamoriNFTSingle,
-                     abi: OmamoriNFTSingleABI,
+                     address: contractAddresses.OmamoriNFTOffChain,
+                     abi: OmamoriNFTOffChainABI,
                      functionName: 'getTokenData',
                      args: [BigInt(tokenId)],
                    } as any)
@@ -151,13 +151,13 @@ export async function fetchRecentTokens(limit: number = 50): Promise<OmamoriToke
 }
 
 /**
- * Fetch a specific token by ID (Single Contract)
+ * Fetch a specific token by ID (Off-Chain Rendering)
  */
 export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | null> {
   try {
     const tokenURI = await readContract(config, {
-      address: contractAddresses.OmamoriNFTSingle,
-      abi: OmamoriNFTSingleABI,
+      address: contractAddresses.OmamoriNFTOffChain,
+      abi: OmamoriNFTOffChainABI,
       functionName: 'tokenURI',
       args: [BigInt(tokenId)],
     } as any) // Cast to any to avoid strict typing issues
@@ -168,11 +168,11 @@ export async function fetchTokenById(tokenId: number): Promise<OmamoriToken | nu
     
     const token = parseTokenURI(tokenId, tokenURI as string)
     
-    // Get additional token data from getTokenData() for OmamoriNFTSingle
+    // Get additional token data from getTokenData() for OmamoriNFTOffChain
     try {
       const tokenData = await readContract(config, {
-        address: contractAddresses.OmamoriNFTSingle,
-        abi: OmamoriNFTSingleABI,
+        address: contractAddresses.OmamoriNFTOffChain,
+        abi: OmamoriNFTOffChainABI,
         functionName: 'getTokenData',
         args: [BigInt(tokenId)],
       } as any)

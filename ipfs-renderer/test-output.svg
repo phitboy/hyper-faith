@@ -1,0 +1,39 @@
+<svg viewBox="0 0 1000 1400" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1000" height="1400" fill="#1b3b8a"/>
+    
+    <!-- Main tablet frame -->
+    <rect x="100" y="150" width="800" height="1100" rx="40" ry="40" 
+          fill="#1b3b8a" stroke="#c0d0ff" stroke-width="6"/>
+    
+    <!-- Content groups with stroke color -->
+    <g stroke="#c0d0ff" stroke-width="6" fill="none">
+      <line x1="230" y1="540" x2="360" y2="410" stroke="#c0d0ff" stroke-width="6"/><circle cx="285" cy="540" r="6" fill="#c0d0ff"/>
+      <line x1="710" y1="1120" x2="850" y2="1000" stroke="#c0d0ff" stroke-width="6"/><circle cx="780" cy="1090" r="6" fill="#c0d0ff"/>
+    </g>
+    
+    <!-- Punch diamond (positioned at 500,700 with relative coordinates) -->
+    <g transform="translate(500, 700)">
+      <rect x="-33" y="-316" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-11 -21 -304)" opacity="0.8"/><rect x="-26" y="-315" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-12 -14 -303)" opacity="0.8"/><rect x="-33" y="-309" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-22 -21 -297)" opacity="0.8"/><rect x="-26" y="-309" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-17 -14 -297)" opacity="0.8"/><rect x="-26" y="-314" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-10 -14 -302)" opacity="0.8"/><rect x="57" y="-109" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-10 69 -97)" opacity="0.8"/><rect x="-23" y="-203" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-20 -11 -191)" opacity="0.8"/><rect x="-65" y="-250" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-14 -53 -238)" opacity="0.8"/><rect x="-63" y="-263" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-11 -51 -251)" opacity="0.8"/><rect x="-70" y="-256" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-12 -58 -244)" opacity="0.8"/><rect x="-58" y="-163" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-22 -46 -151)" opacity="0.8"/><rect x="45" y="-6" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-17 57 6)" opacity="0.8"/><rect x="-21" y="-106" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-10 -9 -94)" opacity="0.8"/><rect x="-115" y="-203" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-10 -103 -191)" opacity="0.8"/><rect x="-72" y="-153" width="12" height="12" fill="#000" stroke="#000" stroke-width="1" transform="rotate(-20 -60 -141)" opacity="0.8"/>
+    </g>
+    
+    <!-- Material label -->
+    <text x="500" y="1300" 
+          font-family="JetBrains Mono, monospace" 
+          font-size="24" 
+          font-weight="500" 
+          fill="#c0d0ff" 
+          text-anchor="middle">
+      LAPIS
+    </text>
+    
+    <!-- Tier indicator -->
+    <text x="500" y="1330" 
+          font-family="Inter, sans-serif" 
+          font-size="16" 
+          fill="#c0d0ff" 
+          text-anchor="middle" 
+          opacity="0.7">
+      Ultra Rare
+    </text>
+  </svg>

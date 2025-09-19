@@ -1,20 +1,20 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import { contractAddresses } from '@/lib/wagmi'
-import { OmamoriNFTSingleABI } from '@/lib/contracts/abis'
+import { OmamoriNFTOffChainABI } from '@/lib/contracts/abis'
 
 /**
- * Hook for reading from the Omamori NFT contract (Single Contract)
+ * Hook for reading from the Omamori NFT contract (Off-Chain Rendering)
  */
 export function useOmamoriContract() {
   return {
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
   }
 }
 
 /**
- * Hook for minting Omamori NFTs (Single Contract) with user-selected arcanum
+ * Hook for minting Omamori NFTs (Off-Chain Rendering) with user-selected arcanum
  */
 export function useMintOmamori() {
   const { writeContract, data: hash, error, isPending } = useWriteContract()
@@ -23,8 +23,8 @@ export function useMintOmamori() {
     const value = parseEther(hypeAmount)
     
     return writeContract({
-      address: contractAddresses.OmamoriNFTSingle,
-      abi: OmamoriNFTSingleABI,
+      address: contractAddresses.OmamoriNFTOffChain,
+      abi: OmamoriNFTOffChainABI,
       functionName: 'mint',
       args: [majorId, minorId],
       value,
@@ -49,12 +49,12 @@ export function useWaitForMint(hash?: `0x${string}`) {
 }
 
 /**
- * Hook for reading token metadata (Single Contract)
+ * Hook for reading token metadata (Off-Chain Rendering)
  */
 export function useTokenURI(tokenId?: number) {
   return useReadContract({
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
     functionName: 'tokenURI',
     args: tokenId ? [BigInt(tokenId)] : undefined,
     query: {
@@ -64,12 +64,12 @@ export function useTokenURI(tokenId?: number) {
 }
 
 /**
- * Hook for reading token data (unpacked) (Single Contract)
+ * Hook for reading token data (unpacked) (Off-Chain Rendering)
  */
 export function useTokenData(tokenId?: number) {
   return useReadContract({
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
     functionName: 'getTokenData',
     args: tokenId ? [BigInt(tokenId)] : undefined,
     query: {
@@ -79,12 +79,12 @@ export function useTokenData(tokenId?: number) {
 }
 
 /**
- * Hook for reading user's token balance (Single Contract)
+ * Hook for reading user's token balance (Off-Chain Rendering)
  */
 export function useTokenBalance(address?: `0x${string}`) {
   return useReadContract({
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
     query: {
@@ -93,15 +93,15 @@ export function useTokenBalance(address?: `0x${string}`) {
   })
 }
 
-// Note: Single contract includes all material data inline - no external calls needed!
+// Note: Off-chain contract includes all material data inline - no external calls needed!
 
 /**
- * Hook for reading material name (Single Contract)
+ * Hook for reading material name (Off-Chain Rendering)
  */
 export function useMaterialName(materialId?: number) {
   return useReadContract({
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
     functionName: 'getMaterialName',
     args: materialId !== undefined ? [materialId] : undefined,
     query: {
@@ -111,12 +111,12 @@ export function useMaterialName(materialId?: number) {
 }
 
 /**
- * Hook for reading material tier (Single Contract)
+ * Hook for reading material tier (Off-Chain Rendering)
  */
 export function useMaterialTier(materialId?: number) {
   return useReadContract({
-    address: contractAddresses.OmamoriNFTSingle,
-    abi: OmamoriNFTSingleABI,
+    address: contractAddresses.OmamoriNFTOffChain,
+    abi: OmamoriNFTOffChainABI,
     functionName: 'getMaterialTier',
     args: materialId !== undefined ? [materialId] : undefined,
     query: {
