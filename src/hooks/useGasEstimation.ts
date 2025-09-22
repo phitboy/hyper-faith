@@ -1,7 +1,7 @@
 import { useEstimateGas, useGasPrice, useAccount } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
 import { contractAddresses } from '@/lib/wagmi'
-import { OmamoriNFTWithRoyaltiesABI } from '@/lib/contracts/abis'
+import { OmamoriNFTWithRoyaltiesABI, OmamoriNFTABI } from '@/lib/contracts/abis'
 import { useQuery } from '@tanstack/react-query'
 
 /**
@@ -151,6 +151,66 @@ export function useTransactionCostBreakdown(hypeAmount: string) {
     enabled: !!totalCost && !isLoading,
     staleTime: 5000,
   })
+}
+
+/**
+ * Hook to estimate gas for transfer transaction
+ */
+export function useTransferGasEstimation(tokenId?: number, toAddress?: `0x${string}`) {
+  const { address } = useAccount()
+  
+  // Estimate gas for transfer function
+  const { data: gasEstimate, isLoading: isEstimatingGas } = useEstimateGas({
+    address: contractAddresses.OmamoriNFT,
+    abi: OmamoriNFTABI,
+    functionName: 'safeTransferFrom',
+    args: address && toAddress && tokenId ? [address, toAddress, BigInt(tokenId)] : undefined,
+    account: address,
+    query: {
+      enabled: !!address && !!toAddress && !!tokenId && tokenId > 0,
+      staleTime: 10000, // 10 seconds
+    },
+  })
+  
+  // Get current gas price
+  const { data: gasPrice, isLoading: isLoadingGasPrice } = useGasPrice({
+    query: {
+      staleTime: 5000, // 5 seconds
+    },
+  })
+  
+  // Calculate total cost (transfers only need gas, no HYPE burn)
+  const totalCost = useQuery({
+    queryKey: ['totalTransferCost', gasEstimate?.toString(), gasPrice?.toString(), tokenId, toAddress],
+    queryFn: () => {
+      if (!gasEstimate || !gasPrice) return null
+      
+      const gasCost = gasEstimate * gasPrice
+      
+      return {
+        gasEstimate: Number(gasEstimate),
+        gasPrice: Number(gasPrice),
+        gasCostWei: gasCost,
+        gasCostHype: formatEther(gasCost),
+        totalWei: gasCost,
+        totalHype: formatEther(gasCost),
+        breakdown: {
+          gas: formatEther(gasCost),
+          total: formatEther(gasCost),
+        }
+      }
+    },
+    enabled: !!gasEstimate && !!gasPrice,
+    staleTime: 5000,
+  })
+  
+  return {
+    gasEstimate,
+    gasPrice,
+    totalCost: totalCost.data,
+    isLoading: isEstimatingGas || isLoadingGasPrice || totalCost.isLoading,
+    error: totalCost.error,
+  }
 }
 
 /**

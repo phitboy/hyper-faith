@@ -22,6 +22,7 @@ interface OmamoriStore {
   setMintSelection: (majorId: number, minorId: number) => void;
   setHypeAmount: (amount: string) => void;
   addToken: (token: OmamoriToken) => void;
+  removeToken: (tokenId: number) => void;
   setMyTokens: (tokens: OmamoriToken[]) => void;
   setAllTokens: (tokens: OmamoriToken[]) => void;
   reset: () => void;
@@ -55,6 +56,12 @@ export const useOmamoriStore = create<OmamoriStore>()(
         set((state) => ({
           myTokens: [token, ...state.myTokens],
           allTokens: [token, ...state.allTokens]
+        }));
+      },
+      
+      removeToken: (tokenId) => {
+        set((state) => ({
+          myTokens: state.myTokens.filter(token => token.tokenId !== tokenId)
         }));
       },
       

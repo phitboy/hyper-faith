@@ -1,4 +1,4 @@
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi'
 import { parseEther } from 'viem'
 import { contractAddresses } from '@/lib/wagmi'
 import { OmamoriNFTABI } from '@/lib/contracts/abis'
@@ -45,6 +45,56 @@ export function useMintOmamori() {
 export function useWaitForMint(hash?: `0x${string}`) {
   return useWaitForTransactionReceipt({
     hash,
+  })
+}
+
+/**
+ * Hook for transferring Omamori NFTs
+ */
+export function useTransferOmamori() {
+  const { writeContract, data: hash, error, isPending } = useWriteContract()
+  
+  const transfer = async (tokenId: number, toAddress: `0x${string}`, fromAddress: `0x${string}`) => {
+    return writeContract({
+      address: contractAddresses.OmamoriNFT,
+      abi: OmamoriNFTABI,
+      functionName: 'safeTransferFrom',
+      args: [fromAddress, toAddress, BigInt(tokenId)],
+    } as any)
+  }
+
+  return {
+    transfer,
+    hash,
+    error,
+    isPending,
+  }
+}
+
+/**
+ * Hook for waiting for transfer transaction confirmation
+ */
+export function useWaitForTransfer(hash?: `0x${string}`) {
+  return useWaitForTransactionReceipt({
+    hash,
+  })
+}
+
+/**
+ * Hook for checking token ownership
+ */
+export function useTokenOwnership(tokenId?: number) {
+  const { address } = useAccount()
+  
+  return useReadContract({
+    address: contractAddresses.OmamoriNFT,
+    abi: OmamoriNFTABI,
+    functionName: 'ownerOf',
+    args: tokenId !== undefined ? [BigInt(tokenId)] : undefined,
+    query: {
+      enabled: !!tokenId && tokenId > 0,
+      staleTime: 30000, // 30 seconds
+    },
   })
 }
 

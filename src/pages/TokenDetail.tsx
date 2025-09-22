@@ -1,21 +1,30 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useAccount } from "wagmi";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TraitTable } from "@/components/TraitTable";
+import { TransferDialog } from "@/components/TransferDialog";
 import { getTokenById } from "@/lib/contracts/omamori";
+import { useTokenOwnership } from "@/hooks/useOmamoriContract";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
-import { ArrowLeft, Copy, Download, Share2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share2, ExternalLink, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import majorsData from "@/data/majors.json";
 
 export default function TokenDetail() {
   const { id } = useParams<{ id: string }>();
+  const { address, isConnected } = useAccount();
   const { toast } = useToast();
   const [token, setToken] = useState<OmamoriToken | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
+  
+  // Check token ownership
+  const { data: tokenOwner } = useTokenOwnership(token?.tokenId);
+  const isOwner = address && tokenOwner && address.toLowerCase() === tokenOwner.toLowerCase();
 
   useEffect(() => {
     loadToken();
@@ -285,7 +294,7 @@ export default function TokenDetail() {
             {/* Full Trait Table */}
             <TraitTable token={token} />
             
-            {/* Action Buttons (Disabled for Mock) */}
+            {/* Action Buttons */}
             <Card className="p-6">
               <h3 className="font-mono text-lg mb-4">Actions</h3>
               <div className="space-y-3">
@@ -299,20 +308,50 @@ export default function TokenDetail() {
                 </Button>
                 
                 <Button
-                  disabled
+                  onClick={() => setShowTransferDialog(true)}
+                  disabled={!isConnected || !isOwner}
                   variant="outline"
-                  className="w-full font-mono opacity-50"
+                  className="w-full font-mono"
                 >
-                  Transfer Token (Coming Soon)
+                  <Send className="w-4 h-4 mr-2" />
+                  Transfer Token
                 </Button>
                 
-                <p className="text-xs text-muted-foreground text-center">
-                  Trading functionality will be available when connected to mainnet
-                </p>
+                {!isConnected && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Connect your wallet to transfer this NFT
+                  </p>
+                )}
+                
+                {isConnected && !isOwner && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    You don't own this NFT
+                  </p>
+                )}
+                
+                {isConnected && isOwner && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Send this NFT to another wallet address
+                  </p>
+                )}
               </div>
             </Card>
           </div>
         </div>
+        
+        {/* Transfer Dialog */}
+        <TransferDialog
+          token={token}
+          open={showTransferDialog}
+          onOpenChange={setShowTransferDialog}
+          onTransferComplete={() => {
+            // Refresh token data or redirect to My Omamori
+            toast({
+              title: "Transfer Complete",
+              description: "The NFT has been transferred successfully.",
+            });
+          }}
+        />
       </div>
     </Layout>
   );

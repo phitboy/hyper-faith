@@ -13,7 +13,7 @@ import { useCallback } from 'react'
 export function useTransferEvents() {
   const { address } = useAccount()
   const { toast } = useToast()
-  const { addToken, setAllTokens, allTokens } = useOmamoriStore()
+  const { addToken, removeToken, setAllTokens, allTokens } = useOmamoriStore()
 
   const handleTransfer = useCallback(async (logs: any[]) => {
     for (const log of logs) {
@@ -56,8 +56,17 @@ export function useTransferEvents() {
         else if (from !== '0x0000000000000000000000000000000000000000') {
           console.log(`Transfer detected: Token #${tokenId} from ${from} to ${to}`)
           
-          // If transferred to current user
-          if (to.toLowerCase() === address?.toLowerCase()) {
+          // If transferred FROM current user (outgoing transfer)
+          if (from.toLowerCase() === address?.toLowerCase()) {
+            removeToken(Number(tokenId))
+            toast({
+              title: "📤 NFT Sent",
+              description: `Token #${tokenId} transferred successfully`,
+            })
+          }
+          
+          // If transferred TO current user (incoming transfer)
+          else if (to.toLowerCase() === address?.toLowerCase()) {
             const token = await fetchTokenById(Number(tokenId))
             if (token) {
               addToken(token)
@@ -72,7 +81,7 @@ export function useTransferEvents() {
         console.error('Error processing transfer event:', error)
       }
     }
-  }, [address, toast, addToken, setAllTokens, allTokens])
+  }, [address, toast, addToken, removeToken, setAllTokens, allTokens])
 
   useWatchContractEvent({
     address: contractAddresses.OmamoriNFT,
