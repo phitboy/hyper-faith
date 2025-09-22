@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useTransferOmamori, useWaitForTransfer, useTokenOwnership } from "@/hooks/useOmamoriContract";
 import { useTransferGasEstimation } from "@/hooks/useGasEstimation";
 import { useToast } from "@/hooks/use-toast";
+import { useDebouncedAddressResolution } from "@/lib/hyperliquid-names";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
-import { Send, AlertTriangle, Loader2, CheckCircle, ExternalLink } from "lucide-react";
+import { Send, AlertTriangle, Loader2, CheckCircle, ExternalLink, Globe } from "lucide-react";
 
 interface TransferDialogProps {
   token: OmamoriToken | null;
@@ -25,24 +27,27 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
   const { toast } = useToast();
   
   // Form state
-  const [toAddress, setToAddress] = useState("");
+  const [toInput, setToInput] = useState("");
   const [step, setStep] = useState<"input" | "confirm" | "pending" | "success">("input");
+  
+  // Hyperliquid Names resolution
+  const nameResolution = useDebouncedAddressResolution(toInput, 300);
   
   // Contract hooks
   const { transfer, hash, error: transferError, isPending } = useTransferOmamori();
   const { data: receipt, isLoading: isConfirming } = useWaitForTransfer(hash);
   const { data: tokenOwner } = useTokenOwnership(token?.tokenId);
   
-  // Gas estimation
+  // Gas estimation - use resolved address from name resolution
   const { totalCost, isLoading: isLoadingGas } = useTransferGasEstimation(
     token?.tokenId, 
-    isAddress(toAddress) ? toAddress as `0x${string}` : undefined
+    nameResolution.resolvedAddress
   );
   
   // Reset form when dialog opens/closes
   useEffect(() => {
     if (open) {
-      setToAddress("");
+      setToInput("");
       setStep("input");
     }
   }, [open]);
@@ -77,18 +82,19 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
   }, [transferError, toast]);
   
   // Validation
-  const isValidAddress = toAddress && isAddress(toAddress);
   const isOwner = address && tokenOwner && address.toLowerCase() === tokenOwner.toLowerCase();
-  const isSelfTransfer = address && toAddress && address.toLowerCase() === toAddress.toLowerCase();
+  const isSelfTransfer = address && nameResolution.resolvedAddress && 
+    address.toLowerCase() === nameResolution.resolvedAddress.toLowerCase();
   
-  const canProceed = isValidAddress && !isSelfTransfer && isOwner && !isLoadingGas;
+  const canProceed = nameResolution.isValid && nameResolution.resolvedAddress && 
+    !isSelfTransfer && isOwner && !isLoadingGas && !nameResolution.isLoading;
   
   const handleTransfer = async () => {
-    if (!token || !address || !isValidAddress || !isOwner) return;
+    if (!token || !address || !nameResolution.resolvedAddress || !isOwner) return;
     
     try {
       setStep("pending");
-      await transfer(token.tokenId, toAddress as `0x${string}`, address);
+      await transfer(token.tokenId, nameResolution.resolvedAddress, address);
     } catch (error) {
       console.error('Transfer error:', error);
       setStep("input");
@@ -131,18 +137,58 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
           
           {step === "input" && (
             <>
-              {/* Address Input */}
+              {/* Address/Name Input */}
               <div className="space-y-2">
-                <Label htmlFor="toAddress">Recipient Address</Label>
-                <Input
-                  id="toAddress"
-                  placeholder="0x..."
-                  value={toAddress}
-                  onChange={(e) => setToAddress(e.target.value)}
-                  className="font-mono"
-                />
-                {toAddress && !isValidAddress && (
-                  <p className="text-sm text-destructive">Invalid Ethereum address</p>
+                <Label htmlFor="toInput">Recipient Address or .hl Name</Label>
+                <div className="relative">
+                  <Input
+                    id="toInput"
+                    placeholder="0x... or name.hl"
+                    value={toInput}
+                    onChange={(e) => setToInput(e.target.value)}
+                    className="font-mono pr-10"
+                  />
+                  {nameResolution.isLoading && (
+                    <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                  )}
+                  {nameResolution.inputType === 'hl-name' && !nameResolution.isLoading && (
+                    <Globe className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-blue-500" />
+                  )}
+                </div>
+                
+                {/* Input Type Badge */}
+                {toInput && nameResolution.inputType !== 'empty' && (
+                  <div className="flex items-center gap-2">
+                    <Badge variant={nameResolution.inputType === 'hl-name' ? 'default' : 'secondary'}>
+                      {nameResolution.inputType === 'hl-name' ? '.hl Name' : 
+                       nameResolution.inputType === 'address' ? 'Address' : 'Invalid'}
+                    </Badge>
+                    {nameResolution.displayName && nameResolution.inputType === 'address' && (
+                      <span className="text-sm text-muted-foreground">
+                        → {nameResolution.displayName}
+                      </span>
+                    )}
+                  </div>
+                )}
+                
+                {/* Resolved Address Preview */}
+                {nameResolution.inputType === 'hl-name' && nameResolution.resolvedAddress && (
+                  <div className="p-2 bg-muted rounded text-sm">
+                    <div className="text-muted-foreground">Resolves to:</div>
+                    <div className="font-mono text-xs break-all">{nameResolution.resolvedAddress}</div>
+                  </div>
+                )}
+                
+                {/* Error Messages */}
+                {nameResolution.error && (
+                  <p className="text-sm text-destructive">
+                    {nameResolution.error.message || 'Failed to resolve name'}
+                  </p>
+                )}
+                {toInput && nameResolution.inputType === 'invalid' && (
+                  <p className="text-sm text-destructive">
+                    Invalid format. Enter an Ethereum address (0x...) or .hl name (name.hl)
+                  </p>
                 )}
                 {isSelfTransfer && (
                   <p className="text-sm text-destructive">Cannot transfer to yourself</p>
@@ -150,7 +196,7 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
               </div>
               
               {/* Gas Estimation */}
-              {isValidAddress && !isSelfTransfer && totalCost && (
+              {nameResolution.resolvedAddress && !isSelfTransfer && totalCost && (
                 <div className="space-y-2">
                   <Label>Estimated Gas Fee</Label>
                   <div className="p-3 bg-muted rounded-lg">
@@ -200,7 +246,25 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">To:</span>
-                    <span className="font-mono text-xs">{toAddress}</span>
+                    <div className="text-right">
+                      {nameResolution.displayName && nameResolution.inputType === 'hl-name' ? (
+                        <div>
+                          <div className="text-sm font-medium">{nameResolution.displayName}</div>
+                          <div className="font-mono text-xs text-muted-foreground">
+                            {nameResolution.resolvedAddress}
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="font-mono text-xs">{nameResolution.resolvedAddress}</div>
+                          {nameResolution.displayName && (
+                            <div className="text-sm text-muted-foreground">
+                              {nameResolution.displayName}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
@@ -275,7 +339,10 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
               <div>
                 <p className="font-medium">Transfer Successful!</p>
                 <p className="text-sm text-muted-foreground">
-                  Omamori #{token.tokenId} has been transferred to {toAddress}
+                  Omamori #{token.tokenId} has been transferred to{' '}
+                  {nameResolution.displayName && nameResolution.inputType === 'hl-name' 
+                    ? nameResolution.displayName 
+                    : nameResolution.resolvedAddress}
                 </p>
               </div>
               {hash && (
