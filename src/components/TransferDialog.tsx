@@ -38,10 +38,13 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
   const { data: receipt, isLoading: isConfirming } = useWaitForTransfer(hash);
   const { data: tokenOwner } = useTokenOwnership(token?.tokenId);
   
-  // Gas estimation - use resolved address from name resolution
+  // Gas estimation - use resolved address or direct address
+  const finalAddressForGas = nameResolution.resolvedAddress || 
+    (nameResolution.inputType === 'address' && isAddress(toInput.trim()) ? toInput.trim() as `0x${string}` : undefined);
+  
   const { totalCost, isLoading: isLoadingGas } = useTransferGasEstimation(
     token?.tokenId, 
-    nameResolution.resolvedAddress
+    finalAddressForGas
   );
   
   // Reset form when dialog opens/closes
@@ -83,18 +86,33 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
   
   // Validation
   const isOwner = address && tokenOwner && address.toLowerCase() === tokenOwner.toLowerCase();
-  const isSelfTransfer = address && nameResolution.resolvedAddress && 
-    address.toLowerCase() === nameResolution.resolvedAddress.toLowerCase();
   
-  const canProceed = nameResolution.isValid && nameResolution.resolvedAddress && 
-    !isSelfTransfer && isOwner && !isLoadingGas && !nameResolution.isLoading;
+  // Check for self-transfer with both resolved addresses and direct addresses
+  const finalAddressForCheck = nameResolution.resolvedAddress || 
+    (nameResolution.inputType === 'address' && isAddress(toInput.trim()) ? toInput.trim() : null);
+  const isSelfTransfer = address && finalAddressForCheck && 
+    address.toLowerCase() === finalAddressForCheck.toLowerCase();
+  
+  // Check if we have valid input and either a resolved address OR it's a valid address directly
+  const hasValidInput = toInput.trim() !== '' && nameResolution.isValid;
+  const hasValidAddress = nameResolution.resolvedAddress || 
+    (nameResolution.inputType === 'address' && isAddress(toInput.trim()));
+  
+  const canProceed = hasValidInput && hasValidAddress && !isSelfTransfer && isOwner && 
+    !isLoadingGas && !nameResolution.isLoading;
   
   const handleTransfer = async () => {
-    if (!token || !address || !nameResolution.resolvedAddress || !isOwner) return;
+    if (!token || !address || !isOwner) return;
+    
+    // Get the final address to transfer to
+    const finalAddress = nameResolution.resolvedAddress || 
+      (nameResolution.inputType === 'address' ? toInput.trim() as `0x${string}` : null);
+    
+    if (!finalAddress) return;
     
     try {
       setStep("pending");
-      await transfer(token.tokenId, nameResolution.resolvedAddress, address);
+      await transfer(token.tokenId, finalAddress, address);
     } catch (error) {
       console.error('Transfer error:', error);
       setStep("input");
@@ -180,9 +198,11 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
                 )}
                 
                 {/* Error Messages */}
-                {nameResolution.error && (
+                {toInput && nameResolution.error && nameResolution.inputType !== 'empty' && (
                   <p className="text-sm text-destructive">
-                    {nameResolution.error.message || 'Failed to resolve name'}
+                    {nameResolution.inputType === 'hl-name' 
+                      ? 'Failed to resolve .hl name. Hyperliquid Names may not be deployed yet.'
+                      : nameResolution.error.message || 'Failed to resolve name'}
                   </p>
                 )}
                 {toInput && nameResolution.inputType === 'invalid' && (
@@ -196,7 +216,7 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
               </div>
               
               {/* Gas Estimation */}
-              {nameResolution.resolvedAddress && !isSelfTransfer && totalCost && (
+              {finalAddressForGas && !isSelfTransfer && totalCost && (
                 <div className="space-y-2">
                   <Label>Estimated Gas Fee</Label>
                   <div className="p-3 bg-muted rounded-lg">
@@ -251,12 +271,12 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
                         <div>
                           <div className="text-sm font-medium">{nameResolution.displayName}</div>
                           <div className="font-mono text-xs text-muted-foreground">
-                            {nameResolution.resolvedAddress}
+                            {nameResolution.resolvedAddress || toInput.trim()}
                           </div>
                         </div>
                       ) : (
                         <div>
-                          <div className="font-mono text-xs">{nameResolution.resolvedAddress}</div>
+                          <div className="font-mono text-xs">{finalAddressForCheck}</div>
                           {nameResolution.displayName && (
                             <div className="text-sm text-muted-foreground">
                               {nameResolution.displayName}
@@ -342,7 +362,7 @@ export function TransferDialog({ token, open, onOpenChange, onTransferComplete }
                   Omamori #{token.tokenId} has been transferred to{' '}
                   {nameResolution.displayName && nameResolution.inputType === 'hl-name' 
                     ? nameResolution.displayName 
-                    : nameResolution.resolvedAddress}
+                    : finalAddressForCheck}
                 </p>
               </div>
               {hash && (
