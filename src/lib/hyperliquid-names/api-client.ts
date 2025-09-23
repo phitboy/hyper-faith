@@ -9,7 +9,7 @@ import { hlNamesContract } from './contract-fallback'
 
 // API Configuration
 const API_BASE_URL = 'https://api.hlnames.xyz'
-// Note: API key might not be needed or might be incorrect - testing without auth first
+const API_KEY = 'CPEPKMI-HUSUX6I-SE2DHEA-YYWFG5Y' // From Swagger docs
 
 // Types for API responses
 export interface HLNameResolution {
@@ -35,13 +35,15 @@ export interface APIError {
  */
 export class HyperliquidNamesAPI {
   private baseURL: string
+  private apiKey: string
 
-  constructor(baseURL: string = API_BASE_URL) {
+  constructor(baseURL: string = API_BASE_URL, apiKey: string = API_KEY) {
     this.baseURL = baseURL
+    this.apiKey = apiKey
   }
 
   /**
-   * Make API request (trying without authentication first)
+   * Make authenticated API request
    */
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
@@ -52,6 +54,8 @@ export class HyperliquidNamesAPI {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+        'Authorization': `Bearer ${this.apiKey}`,
         ...options.headers,
       },
     })
@@ -78,14 +82,12 @@ export class HyperliquidNamesAPI {
       // Normalize name (ensure .hl suffix)
       const normalizedName = name.endsWith('.hl') ? name : `${name}.hl`
       
-      // Try different possible API endpoints based on common patterns
+      // Try API endpoints based on Swagger documentation
       const endpoints = [
-        `/resolve/${normalizedName}`,
         `/api/resolve/${normalizedName}`,
-        `/name/${normalizedName}`,
         `/api/name/${normalizedName}`,
-        `/v1/resolve/${normalizedName}`,
-        `/v1/name/${normalizedName}`
+        `/resolve/${normalizedName}`,
+        `/name/${normalizedName}`
       ]
 
       for (const endpoint of endpoints) {
@@ -136,12 +138,10 @@ export class HyperliquidNamesAPI {
   async reverseResolve(address: string): Promise<ReverseResolution> {
     try {
       const endpoints = [
-        `/reverse/${address}`,
         `/api/reverse/${address}`,
-        `/address/${address}`,
         `/api/address/${address}`,
-        `/v1/reverse/${address}`,
-        `/v1/address/${address}`
+        `/reverse/${address}`,
+        `/address/${address}`
       ]
 
       for (const endpoint of endpoints) {
