@@ -3,22 +3,42 @@
  * 
  * This module provides complete integration with Hyperliquid Names protocol
  * for resolving .hl domains to Ethereum addresses and vice versa.
+ * 
+ * Now uses API-based resolution for reliable, fast name resolution.
  */
 
-// Export all hooks
+// Export API-based hooks (NEW - WORKING)
+export {
+  useHLNameResolution,
+  useHLReverseResolution,
+  useInputValidation,
+  useSmartAddressResolution,
+  useDebouncedAddressResolution,
+  useHLNamesAPITest,
+  useAddressDisplay,
+} from './api-hooks'
+
+// Export API client
+export {
+  hlNamesAPI,
+  resolveHLName,
+  reverseResolveAddress,
+  isValidHLName,
+  testHLNamesAPI,
+  HyperliquidNamesAPI,
+} from './api-client'
+
+// Export legacy contract-based hooks (DEPRECATED - for future use)
 export {
   useHyperliquidNames,
   useReverseResolution,
   useNameValidation,
-  useSmartAddressResolution,
-  useDebouncedAddressResolution,
   useTextRecords,
 } from './hooks'
 
-// Export utilities
+// Export utilities (still useful)
 export {
   namehash,
-  isValidHLName,
   validateAndNormalizeName,
   detectInputType,
   looksLikeAddress,
@@ -29,7 +49,7 @@ export {
   createCacheKey,
 } from './utils'
 
-// Export contract configuration
+// Export contract configuration (for future contract integration)
 export {
   HYPERLIQUID_NAMES_ADDRESSES,
   HyperliquidNamesABI,
@@ -42,6 +62,8 @@ export {
 } from './contracts'
 
 // Export types
+export type { HLNameResolution, ReverseResolution, APIError } from './api-client'
+
 export type HLNameValidation = {
   isValid: boolean
   normalizedName?: string
