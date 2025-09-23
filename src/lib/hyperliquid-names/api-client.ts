@@ -2,12 +2,14 @@
  * Hyperliquid Names API Client
  * 
  * This module provides API-based resolution for .hl names using the official
- * Hyperliquid Names API instead of direct contract calls.
+ * Hyperliquid Names API with contract-based fallback when API fails.
  */
+
+import { hlNamesContract } from './contract-fallback'
 
 // API Configuration
 const API_BASE_URL = 'https://api.hlnames.xyz'
-const API_KEY = 'CPEPKMI-HUSUX6I-SE2DHEA-YYWFG5Y' // From documentation
+// Note: API key might not be needed or might be incorrect - testing without auth first
 
 // Types for API responses
 export interface HLNameResolution {
@@ -33,34 +35,39 @@ export interface APIError {
  */
 export class HyperliquidNamesAPI {
   private baseURL: string
-  private apiKey: string
 
-  constructor(baseURL: string = API_BASE_URL, apiKey: string = API_KEY) {
+  constructor(baseURL: string = API_BASE_URL) {
     this.baseURL = baseURL
-    this.apiKey = apiKey
   }
 
   /**
-   * Make authenticated API request
+   * Make API request (trying without authentication first)
    */
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
+    
+    console.log(`[HLNames API] Trying: ${url}`)
     
     const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
         ...options.headers,
       },
     })
 
+    console.log(`[HLNames API] Response: ${response.status} ${response.statusText}`)
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      throw new Error(`API Error: ${response.status} - ${errorData.message || response.statusText}`)
+      const error = `API Error: ${response.status} - ${errorData.message || response.statusText}`
+      console.error(`[HLNames API] ${error}`)
+      throw new Error(error)
     }
 
-    return response.json()
+    const data = await response.json()
+    console.log(`[HLNames API] Success:`, data)
+    return data
   }
 
   /**
@@ -71,12 +78,14 @@ export class HyperliquidNamesAPI {
       // Normalize name (ensure .hl suffix)
       const normalizedName = name.endsWith('.hl') ? name : `${name}.hl`
       
-      // Try different possible API endpoints
+      // Try different possible API endpoints based on common patterns
       const endpoints = [
-        `/api/resolve/${normalizedName}`,
         `/resolve/${normalizedName}`,
+        `/api/resolve/${normalizedName}`,
+        `/name/${normalizedName}`,
         `/api/name/${normalizedName}`,
-        `/name/${normalizedName}`
+        `/v1/resolve/${normalizedName}`,
+        `/v1/name/${normalizedName}`
       ]
 
       for (const endpoint of endpoints) {
@@ -127,10 +136,12 @@ export class HyperliquidNamesAPI {
   async reverseResolve(address: string): Promise<ReverseResolution> {
     try {
       const endpoints = [
-        `/api/reverse/${address}`,
         `/reverse/${address}`,
+        `/api/reverse/${address}`,
+        `/address/${address}`,
         `/api/address/${address}`,
-        `/address/${address}`
+        `/v1/reverse/${address}`,
+        `/v1/address/${address}`
       ]
 
       for (const endpoint of endpoints) {
@@ -187,6 +198,32 @@ export class HyperliquidNamesAPI {
   }
 
   /**
+   * Try alternative resolution methods when API fails
+   */
+  async resolveNameWithFallback(name: string): Promise<HLNameResolution> {
+    try {
+      // First try the API
+      return await this.resolveName(name)
+    } catch (apiError) {
+      console.warn('[HLNames] API failed, trying contract fallback:', apiError)
+      
+      // Fallback to contract-based resolution
+      try {
+        const contractResult = await hlNamesContract.resolveName(name)
+        console.log('[HLNames] Contract fallback result:', contractResult)
+        return contractResult
+      } catch (contractError) {
+        console.error('[HLNames] Contract fallback also failed:', contractError)
+        return {
+          name: name.endsWith('.hl') ? name : `${name}.hl`,
+          address: '',
+          isValid: false
+        }
+      }
+    }
+  }
+
+  /**
    * Check if a name is valid .hl format
    */
   isValidHLName(name: string): boolean {
@@ -213,7 +250,8 @@ export class HyperliquidNamesAPI {
 export const hlNamesAPI = new HyperliquidNamesAPI()
 
 // Utility functions for direct use
-export const resolveHLName = (name: string) => hlNamesAPI.resolveName(name)
+export const resolveHLName = (name: string) => hlNamesAPI.resolveNameWithFallback(name)
+export const resolveHLNameAPIOnly = (name: string) => hlNamesAPI.resolveName(name)
 export const reverseResolveAddress = (address: string) => hlNamesAPI.reverseResolve(address)
 export const isValidHLName = (name: string) => hlNamesAPI.isValidHLName(name)
 export const testHLNamesAPI = () => hlNamesAPI.testConnection()

@@ -10,14 +10,15 @@ import { hlNamesAPI, type HLNameResolution, type ReverseResolution } from './api
 
 /**
  * Hook for resolving .hl names to Ethereum addresses (forward resolution)
+ * Uses API with contract fallback
  */
 export function useHLNameResolution(name?: string) {
   return useQuery({
     queryKey: ['hl-name-resolution', name],
-    queryFn: () => hlNamesAPI.resolveName(name!),
+    queryFn: () => hlNamesAPI.resolveNameWithFallback(name!),
     enabled: !!name && hlNamesAPI.isValidHLName(name),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+    retry: 1, // Reduced retry since we have fallback
   })
 }
 
