@@ -43,19 +43,19 @@ export class HyperliquidNamesAPI {
   }
 
   /**
-   * Make authenticated API request
+   * Make authenticated API request using only X-API-Key header as per Swagger docs
    */
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
     
     console.log(`[HLNames API] Trying: ${url}`)
+    console.log(`[HLNames API] Using X-API-Key: ${this.apiKey.substring(0, 8)}...`)
     
     const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': this.apiKey,
-        'Authorization': `Bearer ${this.apiKey}`,
         ...options.headers,
       },
     })
@@ -66,6 +66,7 @@ export class HyperliquidNamesAPI {
       const errorData = await response.json().catch(() => ({}))
       const error = `API Error: ${response.status} - ${errorData.message || response.statusText}`
       console.error(`[HLNames API] ${error}`)
+      console.error(`[HLNames API] Error details:`, errorData)
       throw new Error(error)
     }
 
@@ -184,6 +185,41 @@ export class HyperliquidNamesAPI {
   }
 
   /**
+   * Test API connectivity with basic endpoint
+   */
+  async testAPIConnectivity(): Promise<boolean> {
+    try {
+      // Try basic endpoints to test connectivity
+      const testEndpoints = [
+        '/api/health',
+        '/health',
+        '/api/status',
+        '/status',
+        '/api/info',
+        '/info'
+      ]
+
+      for (const endpoint of testEndpoints) {
+        try {
+          console.log(`[HLNames API] Testing connectivity with: ${endpoint}`)
+          await this.makeRequest(endpoint)
+          console.log(`[HLNames API] Connectivity test passed with: ${endpoint}`)
+          return true
+        } catch (error) {
+          console.log(`[HLNames API] ${endpoint} failed:`, error)
+          continue
+        }
+      }
+
+      console.log(`[HLNames API] All connectivity tests failed`)
+      return false
+    } catch (error) {
+      console.error('API connectivity test failed:', error)
+      return false
+    }
+  }
+
+  /**
    * Test API connectivity with known example
    */
   async testConnection(): Promise<boolean> {
@@ -255,3 +291,4 @@ export const resolveHLNameAPIOnly = (name: string) => hlNamesAPI.resolveName(nam
 export const reverseResolveAddress = (address: string) => hlNamesAPI.reverseResolve(address)
 export const isValidHLName = (name: string) => hlNamesAPI.isValidHLName(name)
 export const testHLNamesAPI = () => hlNamesAPI.testConnection()
+export const testHLNamesConnectivity = () => hlNamesAPI.testAPIConnectivity()

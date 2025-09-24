@@ -8,7 +8,8 @@ import {
   useHLReverseResolution, 
   useHLNamesAPITest,
   useDebouncedAddressResolution,
-  testHLNamesAPI 
+  testHLNamesAPI,
+  testHLNamesConnectivity
 } from '@/lib/hyperliquid-names'
 
 /**
@@ -40,6 +41,16 @@ export function HLNamesTest() {
       setManualTestResult(`API Test Error: ${error}`)
     }
   }
+
+  const handleConnectivityTest = async () => {
+    try {
+      setManualTestResult('Testing API Connectivity...')
+      const result = await testHLNamesConnectivity()
+      setManualTestResult(result ? 'API Connectivity OK!' : 'API Connectivity Failed')
+    } catch (error) {
+      setManualTestResult(`Connectivity Error: ${error}`)
+    }
+  }
   
   return (
     <div className="space-y-4 p-4 max-w-2xl mx-auto">
@@ -61,6 +72,9 @@ export function HLNamesTest() {
               </Badge>
               <Button onClick={handleManualTest} size="sm" variant="outline">
                 Manual Test
+              </Button>
+              <Button onClick={handleConnectivityTest} size="sm" variant="outline">
+                Test Connectivity
               </Button>
               {manualTestResult && (
                 <span className="text-sm text-muted-foreground">{manualTestResult}</span>
