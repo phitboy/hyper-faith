@@ -25,6 +25,7 @@ export {
   reverseResolveAddress,
   isValidHLName,
   testHLNamesAPI,
+  testHLNamesConnectivity,
   HyperliquidNamesAPI,
 } from './api-client'
 

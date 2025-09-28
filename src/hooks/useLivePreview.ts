@@ -1,12 +1,9 @@
-import { useReadContract } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
-import { contractAddresses } from '@/lib/wagmi'
-import { MaterialRegistryABI } from '@/lib/contracts/abis'
 import { useOmamoriStore } from '@/store/omamoriStore'
-import { keccak256, toHex, encodePacked } from 'viem'
+import { keccak256, encodePacked } from 'viem'
 
 /**
- * Hook to generate live preview using real contract logic
+ * Hook to generate live preview using simple simulation (MaterialRegistry not available)
  */
 export function useLivePreview() {
   const { selectedMajor, selectedMinor, hypeAmount } = useOmamoriStore()
@@ -14,33 +11,24 @@ export function useLivePreview() {
   // Generate preview seed (simulates what the contract would do)
   const previewSeed = generatePreviewSeed(selectedMajor, selectedMinor, hypeAmount)
   
-  // Get material selection from real contract
-  const { data: materialId } = useReadContract({
-    address: contractAddresses.MaterialRegistry,
-    abi: MaterialRegistryABI,
-    functionName: 'selectMaterial',
-    args: [previewSeed],
-    query: {
-      enabled: !!previewSeed,
-    },
-  })
+  // Since MaterialRegistry is not available in contractAddresses, use simple simulation
+  const materialId = Number(previewSeed) % 24 // 24 materials available
   
-  // Get material data from real contract
-  const { data: materialData } = useReadContract({
-    address: contractAddresses.MaterialRegistry,
-    abi: MaterialRegistryABI,
-    functionName: 'viewMaterial',
-    args: materialId !== undefined ? [materialId] : undefined,
-    query: {
-      enabled: materialId !== undefined,
-    },
-  })
+  // Simulate material data
+  const materials = [
+    { name: 'PAPER', tierName: 'Common', bg: '#c0c0c0', stroke: '#696969' },
+    { name: 'ONYX', tierName: 'Rare', bg: '#4a4a4a', stroke: '#2f2f2f' },
+    { name: 'SLATE', tierName: 'Uncommon', bg: '#b5a642', stroke: '#9acd32' },
+    // Add more as needed...
+  ]
   
-  // Generate preview attributes using contract logic
+  const materialData = materials[materialId % materials.length]
+  
+  // Generate preview attributes using simple logic  
   const previewAttributes = useQuery({
     queryKey: ['previewAttributes', previewSeed, materialId, materialData],
     queryFn: () => {
-      if (!previewSeed || materialId === undefined || !materialData) {
+      if (!previewSeed) {
         return null
       }
       
@@ -50,7 +38,7 @@ export function useLivePreview() {
       return {
         majorId: selectedMajor,
         minorId: selectedMinor,
-        materialId: Number(materialId),
+        materialId: materialId,
         materialName: materialData.name,
         materialTier: materialData.tierName,
         punchCount: Number(seed >> 16n) % 26, // Same as contract logic
@@ -60,7 +48,7 @@ export function useLivePreview() {
         stroke: materialData.stroke,
       }
     },
-    enabled: !!previewSeed && materialId !== undefined && !!materialData,
+    enabled: !!previewSeed,
     staleTime: 1000, // 1 second
   })
   

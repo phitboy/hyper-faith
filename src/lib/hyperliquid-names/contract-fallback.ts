@@ -91,7 +91,8 @@ export class HLNamesContractResolver {
         abi: HYPERLIQUID_NAMES_ABI,
         functionName: 'getAddress',
         args: [tokenId],
-      })
+        authorizationList: undefined, // Add required property
+      } as any)
 
       console.log(`[HLNames Contract] Resolved address: ${address}`)
 
