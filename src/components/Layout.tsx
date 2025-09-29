@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { WalletStatus } from "./WalletStatus";
 import logo from "@/assets/logo.png";
+import { ExternalLink } from "lucide-react";
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -17,7 +18,8 @@ export function Layout({
     href: '/my'
   }, {
     name: 'Explore',
-    href: '/explore'
+    href: 'https://opensea.io/collection/hyperliquid-omamori-39961233',
+    external: true
   }, {
     name: 'About',
     href: '/about'
@@ -44,7 +46,14 @@ export function Layout({
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
               {navigation.map(item => <Button key={item.name} asChild variant={isActive(item.href) ? "secondary" : "ghost"} className="font-mono">
-                  <Link to={item.href}>{item.name}</Link>
+                  {item.external ? (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer">
+                      {item.name}
+                      <ExternalLink className="w-3 h-3 ml-1 inline" />
+                    </a>
+                  ) : (
+                    <Link to={item.href}>{item.name}</Link>
+                  )}
                 </Button>)}
             </nav>
 
@@ -58,7 +67,14 @@ export function Layout({
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-wrap gap-2 mb-4">
               {navigation.map(item => <Button key={item.name} asChild variant={isActive(item.href) ? "secondary" : "ghost"} size="sm" className="font-mono">
-                  <Link to={item.href}>{item.name}</Link>
+                  {item.external ? (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer">
+                      {item.name}
+                      <ExternalLink className="w-3 h-3 ml-1 inline" />
+                    </a>
+                  ) : (
+                    <Link to={item.href}>{item.name}</Link>
+                  )}
                 </Button>)}
             </div>
             <WalletStatus />

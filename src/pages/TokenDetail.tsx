@@ -299,12 +299,18 @@ export default function TokenDetail() {
               <h3 className="font-mono text-lg mb-4">Actions</h3>
               <div className="space-y-3">
                 <Button
-                  disabled
+                  asChild
                   variant="outline"
-                  className="w-full font-mono opacity-50"
+                  className="w-full font-mono"
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  List for Sale (Coming Soon)
+                  <a 
+                    href="https://opensea.io/collection/hyperliquid-omamori-39961233" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    List for Sale on OpenSea
+                  </a>
                 </Button>
                 
                 <Button
