@@ -83,45 +83,43 @@ export class HyperliquidNamesAPI {
       // Normalize name (ensure .hl suffix)
       const normalizedName = name.endsWith('.hl') ? name : `${name}.hl`
       
-      // Try API endpoints based on Swagger documentation
-      const endpoints = [
-        `/api/resolve/${normalizedName}`,
-        `/api/name/${normalizedName}`,
-        `/resolve/${normalizedName}`,
-        `/name/${normalizedName}`
-      ]
+      // Use correct endpoint pattern from HL Names devs: /resolve/address/{domain}
+      const endpoint = `/resolve/address/${normalizedName}`
 
-      for (const endpoint of endpoints) {
-        try {
-          const result = await this.makeRequest<any>(endpoint)
-          
-          // Handle different response formats
-          if (result.address) {
-            return {
-              name: normalizedName,
-              address: result.address,
-              isValid: true
-            }
+      try {
+        const result = await this.makeRequest<any>(endpoint)
+        
+        // Handle different response formats
+        if (result.address) {
+          return {
+            name: normalizedName,
+            address: result.address,
+            isValid: true
           }
-          
-          if (result.resolved_address) {
-            return {
-              name: normalizedName,
-              address: result.resolved_address,
-              isValid: true
-            }
-          }
-        } catch (error) {
-          // Try next endpoint
-          continue
         }
-      }
-
-      // If all endpoints fail, return invalid
-      return {
-        name: normalizedName,
-        address: '',
-        isValid: false
+        
+        if (result.resolved_address) {
+          return {
+            name: normalizedName,
+            address: result.resolved_address,
+            isValid: true
+          }
+        }
+        
+        // If we get a response but no address field, it might be a different format
+        console.log(`[HLNames API] Unexpected response format:`, result)
+        return {
+          name: normalizedName,
+          address: '',
+          isValid: false
+        }
+      } catch (error) {
+        console.error(`[HLNames API] Resolution failed for ${normalizedName}:`, error)
+        return {
+          name: normalizedName,
+          address: '',
+          isValid: false
+        }
       }
     } catch (error) {
       console.error('Name resolution error:', error)
@@ -135,38 +133,35 @@ export class HyperliquidNamesAPI {
 
   /**
    * Reverse resolve Ethereum address to .hl name
+   * Note: Using best guess endpoint pattern - may need adjustment based on API docs
    */
   async reverseResolve(address: string): Promise<ReverseResolution> {
     try {
-      const endpoints = [
-        `/api/reverse/${address}`,
-        `/api/address/${address}`,
-        `/reverse/${address}`,
-        `/address/${address}`
-      ]
-
-      for (const endpoint of endpoints) {
-        try {
-          const result = await this.makeRequest<any>(endpoint)
-          
-          if (result.name) {
-            return {
-              address,
-              name: result.name,
-              isPrimary: result.isPrimary || result.is_primary || true
-            }
+      // Try the most likely endpoint pattern for reverse resolution
+      const endpoint = `/resolve/name/${address}`
+      
+      try {
+        const result = await this.makeRequest<any>(endpoint)
+        
+        if (result.name) {
+          return {
+            address,
+            name: result.name,
+            isPrimary: result.isPrimary || result.is_primary || true
           }
-          
-          if (result.primary_name) {
-            return {
-              address,
-              name: result.primary_name,
-              isPrimary: true
-            }
-          }
-        } catch (error) {
-          continue
         }
+        
+        if (result.primary_name) {
+          return {
+            address,
+            name: result.primary_name,
+            isPrimary: true
+          }
+        }
+        
+        console.log(`[HLNames API] Unexpected reverse resolution response:`, result)
+      } catch (error) {
+        console.error(`[HLNames API] Reverse resolution failed for ${address}:`, error)
       }
 
       return {
