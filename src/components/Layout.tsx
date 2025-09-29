@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { WalletStatus } from "./WalletStatus";
+import logo from "@/assets/logo.png";
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -31,9 +32,7 @@ export function Layout({
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 hover-lift">
-              <div className="w-8 h-8 bg-primary text-primary-foreground rounded flex items-center justify-center font-mono text-sm font-bold">
-                &lt;&gt;
-              </div>
+              <img src={logo} alt="hyper.faith logo" className="w-8 h-8 rounded" />
               <div>
                 <div className="font-mono text-lg font-bold">hyper.faith</div>
                 <div className="text-xs text-muted-foreground -mt-1">
