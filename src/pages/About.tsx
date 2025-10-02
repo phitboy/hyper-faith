@@ -53,15 +53,12 @@ export default function About() {
             
             <div>
               <h3 className="font-mono text-lg text-primary mb-3">The Ritual</h3>
-              <p className="text-muted-foreground leading-relaxed">Choose from twelve Major Arcana—fundamental forces that govern all trading. 
-
-
-Each Major contains four Minor aspects, creating 48 possible combinations. The amount of HYPE you offer influences the material and punch count, determining your talisman's strength.</p>
+              <p className="text-muted-foreground leading-relaxed">Choose from twelve Major Arcana—fundamental forces that govern all trading.  Each Major contains four Minor aspects, creating 48 possible combinations. The amount of HYPE you offer has no influence on your Omamori's traits, but may determine your talisman's strength.</p>
             </div>
             
             <div>
               <h3 className="font-mono text-lg text-primary mb-3">The Punches</h3>
-              <p className="text-muted-foreground leading-relaxed">Each Omamori contains a diamond of up to 25 potential punches—sacred marks that channel an energy of unknown outcomes. </p>
+              <p className="text-muted-foreground leading-relaxed">Each Omamori contains a diamond of up to 26 potential punches—sacred marks that channel an energy of unknown outcomes. </p>
             </div>
           </div>
         </Card>
@@ -127,32 +124,7 @@ Each Major contains four Minor aspects, creating 48 possible combinations. The a
         </Card>
 
         {/* Technical Details */}
-        <Card className="p-8">
-          <h2 className="font-mono text-2xl mb-6">Technical Implementation</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="font-mono text-lg text-primary mb-3">On-Chain Data</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Major/Minor selection (6 bits)</li>
-                <li>• Material ID (5 bits)</li>
-                <li>• Punch count (5 bits)</li>
-                <li>• HYPE burned (uint256)</li>
-                <li>• Generation seed (bytes32)</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-mono text-lg text-primary mb-3">SVG Generation</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Client-side rendering</li>
-                <li>• Deterministic layout from seed</li>
-                <li>• Hand-chiseled aesthetic</li>
-                <li>• Ancient ASCII glyphs</li>
-                <li>• Stone/paper textures</li>
-              </ul>
-            </div>
-          </div>
-        </Card>
+        
 
         {/* Call to Action */}
         <div className="text-center space-y-6">
