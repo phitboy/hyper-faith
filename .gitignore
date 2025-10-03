@@ -62,3 +62,8 @@ audit-package/
 
 # Cursor AI
 .cursor/
+
+# Video assets (large files - deploy separately to production)
+public/intro video.mov
+public/intro-video.mp4
+public/intro-video.webm

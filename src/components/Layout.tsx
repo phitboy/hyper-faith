@@ -12,7 +12,7 @@ export function Layout({
   const location = useLocation();
   const navigation = [{
     name: 'Mint',
-    href: '/'
+    href: '/mint'
   }, {
     name: 'My Omamori',
     href: '/my'
@@ -33,7 +33,7 @@ export function Layout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 hover-lift">
+            <Link to="/mint" className="flex items-center space-x-3 hover-lift">
               <img src={logo} alt="hyper.faith logo" className="w-8 h-8 rounded" />
               <div>
                 <div className="font-mono text-lg font-bold">hyper.faith</div>
