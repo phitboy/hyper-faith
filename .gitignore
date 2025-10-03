@@ -65,5 +65,6 @@ audit-package/
 
 # Video assets (large files - deploy separately to production)
 public/intro video.mov
-public/intro-video.mp4
-public/intro-video.webm
+# Temporarily allowing video files to be committed for initial deployment
+# public/intro-video.mp4
+# public/intro-video.webm
