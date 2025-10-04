@@ -6,6 +6,12 @@ import { SkipForward, Loader2 } from 'lucide-react';
 const INTRO_SEEN_KEY = 'hyper-faith-intro-seen';
 const SKIP_BUTTON_DELAY = 3000; // Show skip button after 3 seconds
 
+// Detect if user is on mobile device
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || window.innerWidth < 768;
+};
+
 export default function Landing() {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -13,6 +19,7 @@ export default function Landing() {
   const [hasError, setHasError] = useState(false);
   const [showSkipButton, setShowSkipButton] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMobile] = useState(isMobileDevice());
 
   // Check if user has already seen the intro
   useEffect(() => {
@@ -126,8 +133,17 @@ export default function Landing() {
         className="absolute inset-0 w-full h-full object-cover"
         aria-label="Introduction video for hyper.faith"
       >
-        <source src="/intro-video.mp4" type="video/mp4" />
-        <source src="/intro-video.webm" type="video/webm" />
+        {isMobile ? (
+          <>
+            <source src="/intro-video-mobile.mp4" type="video/mp4" />
+            <source src="/intro-video-mobile.webm" type="video/webm" />
+          </>
+        ) : (
+          <>
+            <source src="/intro-video.mp4" type="video/mp4" />
+            <source src="/intro-video.webm" type="video/webm" />
+          </>
+        )}
         Your browser does not support the video tag.
       </video>
 
