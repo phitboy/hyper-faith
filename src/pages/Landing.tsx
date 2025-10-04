@@ -147,14 +147,14 @@ export default function Landing() {
         Your browser does not support the video tag.
       </video>
 
-      {/* Skip Button */}
+      {/* Skip Button - Responsive Positioning */}
       {showSkipButton && !isLoading && !isTransitioning && (
-        <div className="absolute bottom-8 right-8 animate-fade-in">
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center md:left-auto md:right-8 md:justify-end animate-fade-in">
           <Button
             onClick={proceedToMint}
             variant="secondary"
             size="lg"
-            className="font-mono shadow-lg hover-lift"
+            className="font-mono shadow-lg hover-lift px-8 py-6 md:px-6 md:py-3"
             aria-label="Skip introduction video"
           >
             <SkipForward className="w-4 h-4 mr-2" />
@@ -163,9 +163,9 @@ export default function Landing() {
         </div>
       )}
 
-      {/* Keyboard Hint */}
+      {/* Keyboard Hint - Desktop Only */}
       {showSkipButton && !isLoading && !isTransitioning && (
-        <div className="absolute bottom-8 left-8 text-sm text-white/60 font-mono animate-fade-in">
+        <div className="hidden md:block absolute bottom-8 left-8 text-sm text-white/60 font-mono animate-fade-in">
           Press ESC, Space, or Enter to skip
         </div>
       )}
