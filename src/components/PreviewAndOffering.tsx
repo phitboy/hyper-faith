@@ -123,14 +123,6 @@ export function PreviewAndOffering({
     }
   };
 
-  const formatGlyph = (glyph: string) => {
-    return glyph.split('\n').map((line, i) => (
-      <div key={i} className="leading-none">
-        {line}
-      </div>
-    ));
-  };
-
   const currentExample = previewExamples[currentExampleIndex];
 
   return (
@@ -143,7 +135,7 @@ export function PreviewAndOffering({
 
       {/* Your Selection Summary */}
       <div className="text-center space-y-2">
-        <div className="font-mono text-5xl glyph">{formatGlyph(major?.glyph || '')}</div>
+        <div className="font-mono text-5xl glyph whitespace-pre-line">{major?.glyph || ''}</div>
         <h2 className="text-2xl md:text-3xl font-mono font-bold">
           {major?.name} • {minor?.name}
         </h2>

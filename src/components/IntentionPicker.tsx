@@ -6,14 +6,6 @@ interface IntentionPickerProps {
 }
 
 export function IntentionPicker({ onSelect }: IntentionPickerProps) {
-  const formatGlyph = (glyph: string) => {
-    return glyph.split('\n').map((line, i) => (
-      <div key={i} className="leading-none">
-        {line}
-      </div>
-    ));
-  };
-
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Header */}
@@ -35,8 +27,8 @@ export function IntentionPicker({ onSelect }: IntentionPickerProps) {
             className="group relative p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary hover:shadow-lg hover:shadow-primary/20 min-h-[200px] flex flex-col items-center justify-center text-center"
           >
             {/* Glyph - Hidden by default, fades in on hover */}
-            <div className="absolute top-4 left-0 right-0 font-mono text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 glyph">
-              {formatGlyph(major.glyph)}
+            <div className="absolute top-4 left-0 right-0 font-mono text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 glyph pointer-events-none whitespace-pre-line">
+              {major.glyph}
             </div>
 
             {/* Intention Statement - Always visible */}

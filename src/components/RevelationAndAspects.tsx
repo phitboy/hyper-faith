@@ -20,14 +20,6 @@ export function RevelationAndAspects({
     return <div>Major not found</div>;
   }
 
-  const formatGlyph = (glyph: string) => {
-    return glyph.split('\n').map((line, i) => (
-      <div key={i} className="leading-none">
-        {line}
-      </div>
-    ));
-  };
-
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Back Button */}
@@ -42,8 +34,8 @@ export function RevelationAndAspects({
 
       {/* Large Major Glyph */}
       <div className="text-center space-y-4">
-        <div className="font-mono text-6xl md:text-8xl leading-tight glyph">
-          {formatGlyph(major.glyph)}
+        <div className="font-mono text-6xl md:text-8xl leading-tight glyph whitespace-pre-line">
+          {major.glyph}
         </div>
         <h2 className="font-mono text-3xl md:text-4xl font-bold">
           {major.name}
@@ -72,8 +64,8 @@ export function RevelationAndAspects({
             >
               <div className="flex items-center gap-4">
                 {/* Aspect Glyph */}
-                <div className="flex-shrink-0 font-mono text-3xl glyph group-hover:text-primary transition-colors">
-                  {formatGlyph(minor.glyph)}
+                <div className="flex-shrink-0 font-mono text-3xl glyph group-hover:text-primary transition-colors whitespace-pre-line">
+                  {minor.glyph}
                 </div>
 
                 {/* Aspect Info */}
