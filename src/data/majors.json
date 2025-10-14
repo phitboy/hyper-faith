@@ -3,132 +3,396 @@
     "id": 0,
     "name": "Liquidity",
     "glyph": "╦\n║\n╬\n║\n╩",
+    "intention": "I seek abundant liquidity",
+    "revelation": "You seek blessings from the god of Liquidity, the eternal river whose waters flow deep and swift, carrying those who trade with grace while drowning those who fight the current.",
     "minors": [
-      { "id": 0, "name": "Fills", "glyph": "▼\n█\n▲" },
-      { "id": 1, "name": "Market-Maker", "glyph": "◄►\n██\n◄►" },
-      { "id": 2, "name": "Spread", "glyph": "←─→\n ═ \n←─→" },
-      { "id": 3, "name": "Volume", "glyph": "███\n███\n███" }
+      { 
+        "id": 0, 
+        "name": "Fills", 
+        "glyph": "▼\n█\n▲",
+        "blessing": "Bless my fills."
+      },
+      { 
+        "id": 1, 
+        "name": "Market-Maker", 
+        "glyph": "◄►\n██\n◄►",
+        "blessing": "A just MM."
+      },
+      { 
+        "id": 2, 
+        "name": "Spread", 
+        "glyph": "←─→\n ═ \n←─→",
+        "blessing": "Favorable spreads."
+      },
+      { 
+        "id": 3, 
+        "name": "Volume", 
+        "glyph": "███\n███\n███",
+        "blessing": "Bountiful volume."
+      }
     ]
   },
   {
     "id": 1,
     "name": "Leverage",
     "glyph": "▲\n█\n█\n█\n▼",
+    "intention": "I seek favor for my leveraged positions",
+    "revelation": "You seek blessings from the god of Leverage, the double-edged sword that amplifies fortune and ruin alike, granting power to the bold and punishing the reckless without mercy.",
     "minors": [
-      { "id": 0, "name": "Margin", "glyph": "┌─┐\n│█│\n└─┘" },
-      { "id": 1, "name": "Liqd", "glyph": "╳\n█\n╳" },
-      { "id": 2, "name": "Max Long", "glyph": "↗\n█\n↗" },
-      { "id": 3, "name": "Max Short", "glyph": "↙\n█\n↙" }
+      { 
+        "id": 0, 
+        "name": "Margin", 
+        "glyph": "┌─┐\n│█│\n└─┘",
+        "blessing": "Preserve my collateral."
+      },
+      { 
+        "id": 1, 
+        "name": "Liqd", 
+        "glyph": "╳\n█\n╳",
+        "blessing": "Shield from liquidation."
+      },
+      { 
+        "id": 2, 
+        "name": "Max Long", 
+        "glyph": "↗\n█\n↗",
+        "blessing": "Ascend unbound."
+      },
+      { 
+        "id": 3, 
+        "name": "Max Short", 
+        "glyph": "↙\n█\n↙",
+        "blessing": "Descend untouched."
+      }
     ]
   },
   {
     "id": 2,
     "name": "Volatility",
     "glyph": "∩\n∪\n∩\n∪\n█",
+    "intention": "I seek a favorable orderbook",
+    "revelation": "You seek blessings from the god of Volatility, the storm-bringer who churns calm waters into crashing waves, revealing opportunity in chaos for those with steady hands.",
     "minors": [
-      { "id": 0, "name": "Pump", "glyph": "↑\n█\n↑" },
-      { "id": 1, "name": "Dump", "glyph": "↓\n█\n↓" },
-      { "id": 2, "name": "Chop", "glyph": "∼\n█\n∼" },
-      { "id": 3, "name": "Pattern", "glyph": "△\n█\n△" }
+      { 
+        "id": 0, 
+        "name": "Pump", 
+        "glyph": "↑\n█\n↑",
+        "blessing": "Ride the surge."
+      },
+      { 
+        "id": 1, 
+        "name": "Dump", 
+        "glyph": "↓\n█\n↓",
+        "blessing": "Profit from panic."
+      },
+      { 
+        "id": 2, 
+        "name": "Chop", 
+        "glyph": "∼\n█\n∼",
+        "blessing": "Survive the grind."
+      },
+      { 
+        "id": 3, 
+        "name": "Pattern", 
+        "glyph": "△\n█\n△",
+        "blessing": "See the signs."
+      }
     ]
   },
   {
     "id": 3,
     "name": "Narrative",
     "glyph": "◇\n◈\n◇\n◈\n◇",
+    "intention": "I seek to make sense of the narrative",
+    "revelation": "You seek blessings from the god of Narrative, the weaver of stories that move markets, who whispers truth to the vigilant and spins illusions for the distracted.",
     "minors": [
-      { "id": 0, "name": "Insider", "glyph": "●\n█\n●" },
-      { "id": 1, "name": "Hype", "glyph": "※\n█\n※" },
-      { "id": 2, "name": "News", "glyph": "N\n█\nN" },
-      { "id": 3, "name": "Cope", "glyph": "⚆\n█\n⚆" }
+      { 
+        "id": 0, 
+        "name": "Insider", 
+        "glyph": "●\n█\n●",
+        "blessing": "Grant me early word."
+      },
+      { 
+        "id": 1, 
+        "name": "Hype", 
+        "glyph": "※\n█\n※",
+        "blessing": "Show me the wave."
+      },
+      { 
+        "id": 2, 
+        "name": "News", 
+        "glyph": "N\n█\nN",
+        "blessing": "Reveal the truth."
+      },
+      { 
+        "id": 3, 
+        "name": "Cope", 
+        "glyph": "⚆\n█\n⚆",
+        "blessing": "See through delusion."
+      }
     ]
   },
   {
     "id": 4,
     "name": "The Macro",
     "glyph": "◣\n█\n█\n█\n◤",
+    "intention": "I seek to make sense of the macro",
+    "revelation": "You seek blessings from the god of The Macro, the ancient force that shapes all markets, whose breath moves nations and whose silence precedes both prosperity and collapse.",
     "minors": [
-      { "id": 0, "name": "Regulator", "glyph": "=\n█\n=" },
-      { "id": 1, "name": "Bear", "glyph": "v\n█\nv" },
-      { "id": 2, "name": "Bull", "glyph": "^\n█\n^" },
-      { "id": 3, "name": "Black Swan", "glyph": "~\n█\n~" }
+      { 
+        "id": 0, 
+        "name": "Regulator", 
+        "glyph": "=\n█\n=",
+        "blessing": "Foresee the decree."
+      },
+      { 
+        "id": 1, 
+        "name": "Bear", 
+        "glyph": "v\n█\nv",
+        "blessing": "Endure winter."
+      },
+      { 
+        "id": 2, 
+        "name": "Bull", 
+        "glyph": "^\n█\n^",
+        "blessing": "Catch the spring."
+      },
+      { 
+        "id": 3, 
+        "name": "Black Swan", 
+        "glyph": "~\n█\n~",
+        "blessing": "Prepare the unknown."
+      }
     ]
   },
   {
     "id": 5,
     "name": "Discipline",
     "glyph": "═\n║\n╬\n║\n═",
+    "intention": "I seek discipline in my trades",
+    "revelation": "You seek blessings from the god of Discipline, the unmoved sentinel who stands between instinct and wisdom, granting iron will to those who embrace restraint over impulse.",
     "minors": [
-      { "id": 0, "name": "Take Profit", "glyph": "✓\n█\n✓" },
-      { "id": 1, "name": "Size", "glyph": "⚏\n█\n⚏" },
-      { "id": 2, "name": "Strategy", "glyph": "⚔\n█\n⚔" },
-      { "id": 3, "name": "Sideline", "glyph": "⊥\n█\n⊥" }
+      { 
+        "id": 0, 
+        "name": "Take Profit", 
+        "glyph": "✓\n█\n✓",
+        "blessing": "Lock my gains."
+      },
+      { 
+        "id": 1, 
+        "name": "Size", 
+        "glyph": "⚏\n█\n⚏",
+        "blessing": "Right-size my risk."
+      },
+      { 
+        "id": 2, 
+        "name": "Strategy", 
+        "glyph": "⚔\n█\n⚔",
+        "blessing": "Keep my plan."
+      },
+      { 
+        "id": 3, 
+        "name": "Sideline", 
+        "glyph": "⊥\n█\n⊥",
+        "blessing": "Know when to wait."
+      }
     ]
   },
   {
     "id": 6,
     "name": "FOMO",
     "glyph": "⟐\n█\n█\n█\n⟐",
+    "intention": "I seek to action my instincts",
+    "revelation": "You seek blessings from the god of FOMO, the lightning deity of opportunity whose strike illuminates fortune for the swift and burns those who hesitate or chase shadows.",
     "minors": [
-      { "id": 0, "name": "BTFD", "glyph": "v\n█\nv" },
-      { "id": 1, "name": "Top Signal", "glyph": "^\n█\n^" },
-      { "id": 2, "name": "Market Price", "glyph": "*\n█\n*" },
-      { "id": 3, "name": "Conviction", "glyph": "D\n█\nD" }
+      { 
+        "id": 0, 
+        "name": "BTFD", 
+        "glyph": "v\n█\nv",
+        "blessing": "Strike the bottom."
+      },
+      { 
+        "id": 1, 
+        "name": "Top Signal", 
+        "glyph": "^\n█\n^",
+        "blessing": "Catch the breakout."
+      },
+      { 
+        "id": 2, 
+        "name": "Market Price", 
+        "glyph": "*\n█\n*",
+        "blessing": "Enter with speed."
+      },
+      { 
+        "id": 3, 
+        "name": "Conviction", 
+        "glyph": "D\n█\nD",
+        "blessing": "Double down boldly."
+      }
     ]
   },
   {
     "id": 7,
     "name": "FUD",
     "glyph": "☁\n☁\n█\n☁\n☁",
+    "intention": "I seek protection from FUD",
+    "revelation": "You seek blessings from the god of FUD, the shadow-walker who feeds on fear and doubt, granting sight to see through manipulation and armor against the weapons of terror.",
     "minors": [
-      { "id": 0, "name": "Shills", "glyph": "!\n█\n!" },
-      { "id": 1, "name": "PsyOps", "glyph": "@\n█\n@" },
-      { "id": 2, "name": "Rugs", "glyph": "^\n█\n^" },
-      { "id": 3, "name": "Scam", "glyph": "X\n█\nX" }
+      { 
+        "id": 0, 
+        "name": "Shills", 
+        "glyph": "!\n█\n!",
+        "blessing": "Silence the noise."
+      },
+      { 
+        "id": 1, 
+        "name": "PsyOps", 
+        "glyph": "@\n█\n@",
+        "blessing": "See the game."
+      },
+      { 
+        "id": 2, 
+        "name": "Rugs", 
+        "glyph": "^\n█\n^",
+        "blessing": "Shield from scams."
+      },
+      { 
+        "id": 3, 
+        "name": "Scam", 
+        "glyph": "X\n█\nX",
+        "blessing": "Detect the trap."
+      }
     ]
   },
   {
     "id": 8,
     "name": "RNG",
     "glyph": "??\n??\n█\n??\n??",
+    "intention": "I seek a favorable dice roll",
+    "revelation": "You seek blessings from the god of RNG, the chaos incarnate who governs all uncertainty, blessing the fortunate with inexplicable luck while testing the faithful with random trials.",
     "minors": [
-      { "id": 0, "name": "Mints", "glyph": "[]\n█\n[]" },
-      { "id": 1, "name": "Order Routing", "glyph": "X\n█\nX" },
-      { "id": 2, "name": "Uptime", "glyph": "O\n█\nO" },
-      { "id": 3, "name": "Prediction", "glyph": "?\n█\n?" }
+      { 
+        "id": 0, 
+        "name": "Mints", 
+        "glyph": "[]\n█\n[]",
+        "blessing": "Bless my drop."
+      },
+      { 
+        "id": 1, 
+        "name": "Order Routing", 
+        "glyph": "X\n█\nX",
+        "blessing": "Perfect my path."
+      },
+      { 
+        "id": 2, 
+        "name": "Uptime", 
+        "glyph": "O\n█\nO",
+        "blessing": "Grant reliability."
+      },
+      { 
+        "id": 3, 
+        "name": "Prediction", 
+        "glyph": "?\n█\n?",
+        "blessing": "See the unseen."
+      }
     ]
   },
   {
     "id": 9,
     "name": "Max Pain",
     "glyph": "×\n×\n█\n×\n×",
+    "intention": "I seek relief from my regrets",
+    "revelation": "You seek blessings from the god of Max Pain, the merciless teacher who dwells at the intersection of all wrong timing, offering redemption to those who learn from their deepest mistakes.",
     "minors": [
-      { "id": 0, "name": "Too Early", "glyph": "◀\n█\n◀" },
-      { "id": 1, "name": "Too Late", "glyph": "▶\n█\n▶" },
-      { "id": 2, "name": "Too Little", "glyph": "▽\n█\n▽" },
-      { "id": 3, "name": "Too Much", "glyph": "△\n█\n△" }
+      { 
+        "id": 0, 
+        "name": "Too Early", 
+        "glyph": "◀\n█\n◀",
+        "blessing": "Cure my impatience."
+      },
+      { 
+        "id": 1, 
+        "name": "Too Late", 
+        "glyph": "▶\n█\n▶",
+        "blessing": "End my hesitation."
+      },
+      { 
+        "id": 2, 
+        "name": "Too Little", 
+        "glyph": "▽\n█\n▽",
+        "blessing": "Banish my timidity."
+      },
+      { 
+        "id": 3, 
+        "name": "Too Much", 
+        "glyph": "△\n█\n△",
+        "blessing": "Temper my greed."
+      }
     ]
   },
   {
     "id": 10,
     "name": "The Chat",
     "glyph": "...\n...\n█\n...\n...",
+    "intention": "I seek signal from the noise",
+    "revelation": "You seek blessings from the god of The Chat, the thousand-voiced oracle whose channels overflow with wisdom and waste, granting discernment to separate prophecy from spam.",
     "minors": [
-      { "id": 0, "name": "Alpha", "glyph": "Α\n█\nΑ" },
-      { "id": 1, "name": "Slop", "glyph": "∼\n█\n∼" },
-      { "id": 2, "name": "In", "glyph": "→\n█\n→" },
-      { "id": 3, "name": "Out", "glyph": "←\n█\n←" }
+      { 
+        "id": 0, 
+        "name": "Alpha", 
+        "glyph": "Α\n█\nΑ",
+        "blessing": "Show me edge."
+      },
+      { 
+        "id": 1, 
+        "name": "Slop", 
+        "glyph": "∼\n█\n∼",
+        "blessing": "Filter the garbage."
+      },
+      { 
+        "id": 2, 
+        "name": "In", 
+        "glyph": "→\n█\n→",
+        "blessing": "Join the winners."
+      },
+      { 
+        "id": 3, 
+        "name": "Out", 
+        "glyph": "←\n█\n←",
+        "blessing": "Know when to leave."
+      }
     ]
   },
   {
     "id": 11,
     "name": "Ego",
     "glyph": "⌂\n██\n███\n██\n⌂",
+    "intention": "I seek self-awareness",
+    "revelation": "You seek blessings from the god of Ego, the mirror that reflects all truth, who humbles the arrogant and empowers those who see themselves clearly without illusion or delusion.",
     "minors": [
-      { "id": 0, "name": "Touch Grass", "glyph": "^\n█\n^" },
-      { "id": 1, "name": "\"Hyperliquid\"", "glyph": "HL\n█\nHL" },
-      { "id": 2, "name": "Family", "glyph": "F\n█\nF" },
-      { "id": 3, "name": "Needs", "glyph": "$\n█\n$" }
+      { 
+        "id": 0, 
+        "name": "Touch Grass", 
+        "glyph": "^\n█\n^",
+        "blessing": "Pull me from screens."
+      },
+      { 
+        "id": 1, 
+        "name": "\"Hyperliquid\"", 
+        "glyph": "HL\n█\nHL",
+        "blessing": "Ground me here."
+      },
+      { 
+        "id": 2, 
+        "name": "Family", 
+        "glyph": "F\n█\nF",
+        "blessing": "Trade for them."
+      },
+      { 
+        "id": 3, 
+        "name": "Needs", 
+        "glyph": "$\n█\n$",
+        "blessing": "Show me enough."
+      }
     ]
   }
 ]

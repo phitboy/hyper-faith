@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Layout } from "@/components/Layout";
-import { MajorMinorPicker } from "@/components/MajorMinorPicker";
-import { HypeInput } from "@/components/HypeInput";
-import { FairPreview } from "@/components/FairPreview";
-import { GasEstimator } from "@/components/GasEstimator";
+import { IntentionPicker } from "@/components/IntentionPicker";
+import { RevelationAndAspects } from "@/components/RevelationAndAspects";
+import { PreviewAndOffering } from "@/components/PreviewAndOffering";
+import { ForgingAnimation } from "@/components/ForgingAnimation";
+import { ReturningUserBanner } from "@/components/ReturningUserBanner";
 import { useOmamoriStore } from "@/store/omamoriStore";
 import { useMintOmamori, useWaitForMint } from "@/hooks/useOmamoriContract";
 import { useOmamoriEvents } from "@/hooks/useContractEvents";
@@ -16,8 +17,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { TraitTable } from "@/components/TraitTable";
 import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { Link } from "react-router-dom";
-import { Share2, Eye, Loader2 } from "lucide-react";
+import { Share2, Eye } from "lucide-react";
 import { hyperEVM } from "@/lib/chains";
+
+type MintStep = 'intention' | 'revelation' | 'offering' | 'forging';
 export default function Mint() {
   const { toast } = useToast();
   const { isConnected, address } = useAccount();
@@ -26,7 +29,9 @@ export default function Mint() {
     selectedMajor,
     selectedMinor,
     hypeAmount,
-    addToken
+    addToken,
+    setSelectedMajor,
+    setSelectedMinor,
   } = useOmamoriStore();
   
   // Contract hooks
@@ -34,23 +39,50 @@ export default function Mint() {
   const { data: receipt, isLoading: isConfirming } = useWaitForMint(hash);
   
   // State
+  const [currentStep, setCurrentStep] = useState<MintStep>('intention');
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
   const [mintedToken, setMintedToken] = useState<OmamoriToken | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
-  // Note: We now fetch token metadata directly using fetchTokenById instead of useTokenURI
+  const [userMintCount, setUserMintCount] = useState(0);
   
   // Check if we're on the correct network
   const isCorrectNetwork = chainId === hyperEVM.id;
   
   // Enable real-time event listening
   useOmamoriEvents();
+
+  // Load user mint count from localStorage
+  useEffect(() => {
+    const storedCount = localStorage.getItem('user_mint_count');
+    if (storedCount) {
+      setUserMintCount(parseInt(storedCount, 10));
+    }
+  }, []);
   
+  // Step navigation handlers
+  const handleSelectIntention = (majorId: number) => {
+    setSelectedMajor(majorId);
+    setCurrentStep('revelation');
+  };
+
+  const handleSelectAspect = (minorId: number) => {
+    setSelectedMinor(minorId);
+    setCurrentStep('offering');
+  };
+
+  const handleBackToIntention = () => {
+    setCurrentStep('intention');
+  };
+
+  const handleBackToRevelation = () => {
+    setCurrentStep('revelation');
+  };
+
   const handleMint = async () => {
     if (!isConnected || !address) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to mint an Omamori",
+        description: "Please connect your wallet in the header to mint",
         variant: "destructive"
       });
       return;
@@ -75,14 +107,16 @@ export default function Mint() {
     }
     
     try {
+      setCurrentStep('forging');
       await mint(hypeAmount, selectedMajor, selectedMinor);
       
       toast({
         title: "Transaction Submitted",
-        description: "Waiting for confirmation...",
+        description: "Forging your omamori...",
       });
     } catch (error) {
       console.error('Mint error:', error);
+      setCurrentStep('offering'); // Return to offering on error
       toast({
         title: "Mint Failed",
         description: getContractErrorMessage(error),
@@ -92,23 +126,30 @@ export default function Mint() {
   };
   
   // Handle successful transaction
-  React.useEffect(() => {
+  useEffect(() => {
     if (receipt && receipt.status === 'success') {
       // Extract token ID from transaction logs
       const tokenId = extractTokenIdFromLogs(receipt.logs);
       
       if (tokenId) {
         setMintedTokenId(tokenId);
+        setCurrentStep('intention'); // Reset to start for next mint
+        
+        // Increment mint count
+        const newCount = userMintCount + 1;
+        setUserMintCount(newCount);
+        localStorage.setItem('user_mint_count', newCount.toString());
+        
         toast({
-          title: "Omamori Minted!",
+          title: "Omamori Forged!",
           description: `Successfully minted token #${tokenId}`,
         });
       }
     }
-  }, [receipt, toast]);
+  }, [receipt, toast, userMintCount]);
   
   // Handle token metadata fetching
-  React.useEffect(() => {
+  useEffect(() => {
     if (mintedTokenId) {
       const fetchTokenData = async () => {
         try {
@@ -135,8 +176,9 @@ export default function Mint() {
   }, [mintedTokenId, addToken, toast]);
   
   // Handle mint errors
-  React.useEffect(() => {
+  useEffect(() => {
     if (mintError) {
+      setCurrentStep('offering'); // Return to offering on error
       toast({
         title: "Transaction Failed",
         description: getContractErrorMessage(mintError),
@@ -146,60 +188,55 @@ export default function Mint() {
   }, [mintError, toast]);
   
   const isMinting = isPending || isConfirming;
+  
   const handleShare = (token: OmamoriToken) => {
-    const tweetText = `Just minted my Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
+    const tweetText = `Just forged my Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(tweetUrl, '_blank');
   };
-  return <Layout>
-      <div className="space-y-8">
+
+  return (
+    <Layout>
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Hero Section */}
         <div className="text-center space-y-4">
-          <h1 className="font-mono text-4xl md:text-6xl font-bold">Orderbook Omamori</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Ancient talismans for the modern trader. 100% of $HYPE offered is "burned" to the assistance fund.</p>
+          <h1 className="font-mono text-4xl md:text-6xl font-bold">Forge Your Omamori</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Ancient talismans for the modern trader. 100% of HYPE offered supports the assistance fund.
+          </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Selection */}
-          <div className="space-y-8">
-            <MajorMinorPicker />
-            
-            <div className="space-y-6">
-              <HypeInput />
-              
-              {/* Mint Button */}
-              <Button 
-                onClick={handleMint} 
-                disabled={!isConnected || !isCorrectNetwork || isMinting} 
-                className="w-full h-12 text-lg font-mono hover-lift focus-ring" 
-                size="lg"
-              >
-                {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {isConfirming && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {isPending ? 'Confirm in Wallet...' : 
-                 isConfirming ? 'Minting...' : 
-                 'Burn HYPE & Mint'}
-              </Button>
-              
-              {!isConnected && (
-                <p className="text-sm text-muted-foreground text-center">
-                  Connect your wallet above to mint
-                </p>
-              )}
-              
-              {isConnected && !isCorrectNetwork && (
-                <p className="text-sm text-destructive text-center">
-                  Please switch to HyperEVM network to mint
-                </p>
-              )}
-            </div>
-          </div>
+        {/* Returning User Banner */}
+        {userMintCount > 0 && <ReturningUserBanner mintCount={userMintCount} />}
 
-          {/* Right Column - Fair Preview */}
-          <div className="space-y-6">
-            <FairPreview />
-            <GasEstimator hypeAmount={hypeAmount} />
-          </div>
+        {/* Step-based Content */}
+        <div className="min-h-[600px]">
+          {currentStep === 'intention' && (
+            <IntentionPicker onSelect={handleSelectIntention} />
+          )}
+
+          {currentStep === 'revelation' && (
+            <RevelationAndAspects
+              majorId={selectedMajor}
+              onSelectAspect={handleSelectAspect}
+              onBack={handleBackToIntention}
+            />
+          )}
+
+          {currentStep === 'offering' && (
+            <PreviewAndOffering
+              majorId={selectedMajor}
+              minorId={selectedMinor}
+              onMint={handleMint}
+              onBack={handleBackToRevelation}
+              isMinting={isMinting}
+              isPending={isPending}
+              isConfirming={isConfirming}
+            />
+          )}
+
+          {/* Forging Animation (Full Screen Overlay) */}
+          <ForgingAnimation isActive={currentStep === 'forging' || isMinting} />
         </div>
 
         {/* Success Modal */}
@@ -207,33 +244,37 @@ export default function Mint() {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle className="font-mono text-2xl">
-                Omamori Minted Successfully! 🎉
+                Omamori Forged Successfully!
               </DialogTitle>
               <DialogDescription>
-                Your protective talisman has been forged in the blockchain fires
+                Your protective talisman has been sealed by the blockchain
               </DialogDescription>
             </DialogHeader>
-            
-            {mintedToken && <div className="space-y-6">
+
+            {mintedToken && (
+              <div className="space-y-6">
                 {/* Token Preview */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="aspect-[5/7] bg-parchment paper-texture rounded overflow-hidden">
                     {mintedToken.imageSvg.startsWith('http') ? (
-                      <img 
-                        src={mintedToken.imageSvg} 
+                      <img
+                        src={mintedToken.imageSvg}
                         alt={`Omamori #${mintedToken.tokenId}`}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full" dangerouslySetInnerHTML={{
-                        __html: mintedToken.imageSvg
-                      }} />
+                      <div
+                        className="w-full h-full"
+                        dangerouslySetInnerHTML={{
+                          __html: mintedToken.imageSvg,
+                        }}
+                      />
                     )}
                   </div>
-                  
+
                   <TraitTable token={mintedToken} />
                 </div>
-                
+
                 {/* Action Buttons */}
                 <div className="flex gap-3 justify-center">
                   <Button asChild variant="outline" className="font-mono">
@@ -242,15 +283,21 @@ export default function Mint() {
                       View in My Omamori
                     </Link>
                   </Button>
-                  
-                  <Button onClick={() => handleShare(mintedToken)} variant="outline" className="font-mono">
+
+                  <Button
+                    onClick={() => handleShare(mintedToken)}
+                    variant="outline"
+                    className="font-mono"
+                  >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share on Twitter
                   </Button>
                 </div>
-              </div>}
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>;
+    </Layout>
+  );
 }
