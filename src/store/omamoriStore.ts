@@ -19,6 +19,8 @@ interface OmamoriStore {
   
   // Actions
   setWalletState: (connected: boolean, address?: `0x${string}`, chainId?: number) => void;
+  setSelectedMajor: (majorId: number) => void;
+  setSelectedMinor: (minorId: number) => void;
   setMintSelection: (majorId: number, minorId: number) => void;
   setHypeAmount: (amount: string) => void;
   addToken: (token: OmamoriToken) => void;
@@ -42,6 +44,14 @@ export const useOmamoriStore = create<OmamoriStore>()(
       // Actions
       setWalletState: (connected, address, chainId) => {
         set({ isConnected: connected, address, chainId });
+      },
+      
+      setSelectedMajor: (majorId) => {
+        set({ selectedMajor: majorId });
+      },
+      
+      setSelectedMinor: (minorId) => {
+        set({ selectedMinor: minorId });
       },
       
       setMintSelection: (majorId, minorId) => {
