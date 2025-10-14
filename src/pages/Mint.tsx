@@ -19,11 +19,15 @@ import type { OmamoriToken } from "@/lib/contracts/omamori";
 import { Link } from "react-router-dom";
 import { Share2, Eye } from "lucide-react";
 import { hyperEVM } from "@/lib/chains";
-
 type MintStep = 'intention' | 'revelation' | 'offering' | 'forging';
 export default function Mint() {
-  const { toast } = useToast();
-  const { isConnected, address } = useAccount();
+  const {
+    toast
+  } = useToast();
+  const {
+    isConnected,
+    address
+  } = useAccount();
   const chainId = useChainId();
   const {
     selectedMajor,
@@ -31,23 +35,31 @@ export default function Mint() {
     hypeAmount,
     addToken,
     setSelectedMajor,
-    setSelectedMinor,
+    setSelectedMinor
   } = useOmamoriStore();
-  
+
   // Contract hooks
-  const { mint, hash, error: mintError, isPending } = useMintOmamori();
-  const { data: receipt, isLoading: isConfirming } = useWaitForMint(hash);
-  
+  const {
+    mint,
+    hash,
+    error: mintError,
+    isPending
+  } = useMintOmamori();
+  const {
+    data: receipt,
+    isLoading: isConfirming
+  } = useWaitForMint(hash);
+
   // State
   const [currentStep, setCurrentStep] = useState<MintStep>('intention');
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
   const [mintedToken, setMintedToken] = useState<OmamoriToken | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [userMintCount, setUserMintCount] = useState(0);
-  
+
   // Check if we're on the correct network
   const isCorrectNetwork = chainId === hyperEVM.id;
-  
+
   // Enable real-time event listening
   useOmamoriEvents();
 
@@ -58,26 +70,22 @@ export default function Mint() {
       setUserMintCount(parseInt(storedCount, 10));
     }
   }, []);
-  
+
   // Step navigation handlers
   const handleSelectIntention = (majorId: number) => {
     setSelectedMajor(majorId);
     setCurrentStep('revelation');
   };
-
   const handleSelectAspect = (minorId: number) => {
     setSelectedMinor(minorId);
     setCurrentStep('offering');
   };
-
   const handleBackToIntention = () => {
     setCurrentStep('intention');
   };
-
   const handleBackToRevelation = () => {
     setCurrentStep('revelation');
   };
-
   const handleMint = async () => {
     if (!isConnected || !address) {
       toast({
@@ -87,7 +95,6 @@ export default function Mint() {
       });
       return;
     }
-    
     if (!isCorrectNetwork) {
       toast({
         title: "Wrong Network",
@@ -96,7 +103,6 @@ export default function Mint() {
       });
       return;
     }
-    
     if (!validateHypeAmount(hypeAmount)) {
       toast({
         title: "Invalid Amount",
@@ -105,14 +111,12 @@ export default function Mint() {
       });
       return;
     }
-    
     try {
       setCurrentStep('forging');
       await mint(hypeAmount, selectedMajor, selectedMinor);
-      
       toast({
         title: "Transaction Submitted",
-        description: "Forging your omamori...",
+        description: "Forging your omamori..."
       });
     } catch (error) {
       console.error('Mint error:', error);
@@ -124,30 +128,28 @@ export default function Mint() {
       });
     }
   };
-  
+
   // Handle successful transaction
   useEffect(() => {
     if (receipt && receipt.status === 'success') {
       // Extract token ID from transaction logs
       const tokenId = extractTokenIdFromLogs(receipt.logs);
-      
       if (tokenId) {
         setMintedTokenId(tokenId);
         setCurrentStep('intention'); // Reset to start for next mint
-        
+
         // Increment mint count
         const newCount = userMintCount + 1;
         setUserMintCount(newCount);
         localStorage.setItem('user_mint_count', newCount.toString());
-        
         toast({
           title: "Omamori Forged!",
-          description: `Successfully minted token #${tokenId}`,
+          description: `Successfully minted token #${tokenId}`
         });
       }
     }
   }, [receipt, toast, userMintCount]);
-  
+
   // Handle token metadata fetching
   useEffect(() => {
     if (mintedTokenId) {
@@ -170,11 +172,10 @@ export default function Mint() {
           });
         }
       };
-      
       fetchTokenData();
     }
   }, [mintedTokenId, addToken, toast]);
-  
+
   // Handle mint errors
   useEffect(() => {
     if (mintError) {
@@ -186,58 +187,33 @@ export default function Mint() {
       });
     }
   }, [mintError, toast]);
-  
   const isMinting = isPending || isConfirming;
-  
   const handleShare = (token: OmamoriToken) => {
     const tweetText = `Just forged my Omamori #${token.tokenId}!\n\n${token.materialTier} ${token.materialName} with ${token.punchCount} punches\n\nMint yours at hyper.faith`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(tweetUrl, '_blank');
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Hero Section - Only show on Step 1 */}
-        {currentStep === 'intention' && (
-          <>
+        {currentStep === 'intention' && <>
             <div className="text-center space-y-4">
-              <h1 className="font-mono text-4xl md:text-6xl font-bold">Burn $HYPE, Get Blessed</h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Ancient talismans for the modern trader. 100% of HYPE offered supports the assistance fund.
-              </p>
+              <h1 className="font-mono text-4xl md:text-6xl font-bold">Burn $HYPE,Get Blessed</h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Ancient talismans for the modern trader. 
+100% of HYPE offered supports the assistance fund.</p>
             </div>
 
             {/* Returning User Banner */}
             {userMintCount > 0 && <ReturningUserBanner mintCount={userMintCount} />}
-          </>
-        )}
+          </>}
 
         {/* Step-based Content */}
         <div className={`min-h-[600px] ${currentStep !== 'intention' ? 'pt-8' : ''}`}>
-          {currentStep === 'intention' && (
-            <IntentionPicker onSelect={handleSelectIntention} />
-          )}
+          {currentStep === 'intention' && <IntentionPicker onSelect={handleSelectIntention} />}
 
-          {currentStep === 'revelation' && (
-            <RevelationAndAspects
-              majorId={selectedMajor}
-              onSelectAspect={handleSelectAspect}
-              onBack={handleBackToIntention}
-            />
-          )}
+          {currentStep === 'revelation' && <RevelationAndAspects majorId={selectedMajor} onSelectAspect={handleSelectAspect} onBack={handleBackToIntention} />}
 
-          {currentStep === 'offering' && (
-            <PreviewAndOffering
-              majorId={selectedMajor}
-              minorId={selectedMinor}
-              onMint={handleMint}
-              onBack={handleBackToRevelation}
-              isMinting={isMinting}
-              isPending={isPending}
-              isConfirming={isConfirming}
-            />
-          )}
+          {currentStep === 'offering' && <PreviewAndOffering majorId={selectedMajor} minorId={selectedMinor} onMint={handleMint} onBack={handleBackToRevelation} isMinting={isMinting} isPending={isPending} isConfirming={isConfirming} />}
 
           {/* Forging Animation (Full Screen Overlay) */}
           <ForgingAnimation isActive={currentStep === 'forging' || isMinting} />
@@ -255,25 +231,13 @@ export default function Mint() {
               </DialogDescription>
             </DialogHeader>
 
-            {mintedToken && (
-              <div className="space-y-6">
+            {mintedToken && <div className="space-y-6">
                 {/* Token Preview */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="aspect-[5/7] bg-parchment paper-texture rounded overflow-hidden">
-                    {mintedToken.imageSvg.startsWith('http') ? (
-                      <img
-                        src={mintedToken.imageSvg}
-                        alt={`Omamori #${mintedToken.tokenId}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-full"
-                        dangerouslySetInnerHTML={{
-                          __html: mintedToken.imageSvg,
-                        }}
-                      />
-                    )}
+                    {mintedToken.imageSvg.startsWith('http') ? <img src={mintedToken.imageSvg} alt={`Omamori #${mintedToken.tokenId}`} className="w-full h-full object-cover" /> : <div className="w-full h-full" dangerouslySetInnerHTML={{
+                  __html: mintedToken.imageSvg
+                }} />}
                   </div>
 
                   <TraitTable token={mintedToken} />
@@ -288,20 +252,14 @@ export default function Mint() {
                     </Link>
                   </Button>
 
-                  <Button
-                    onClick={() => handleShare(mintedToken)}
-                    variant="outline"
-                    className="font-mono"
-                  >
+                  <Button onClick={() => handleShare(mintedToken)} variant="outline" className="font-mono">
                     <Share2 className="w-4 h-4 mr-2" />
                     Share on Twitter
                   </Button>
                 </div>
-              </div>
-            )}
+              </div>}
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
-  );
+    </Layout>;
 }
