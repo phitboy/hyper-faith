@@ -139,20 +139,7 @@ export default function About() {
         </div>
 
         {/* Community Links */}
-        <Card className="p-8 text-center">
-          <h3 className="font-mono text-lg mb-4">Transparency</h3>
-          <div className="flex justify-center space-x-6">
-            <Button variant="outline" className="font-mono" disabled>
-              Discord (Coming Soon)
-            </Button>
-            <Button variant="outline" className="font-mono" disabled>
-              Twitter (Coming Soon)
-            </Button>
-            <Button variant="outline" className="font-mono" disabled>
-              GitHub (Coming Soon)
-            </Button>
-          </div>
-        </Card>
+        
       </div>
     </Layout>;
 }
