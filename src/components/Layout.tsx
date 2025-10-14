@@ -93,7 +93,7 @@ export function Layout({
           <div className="text-center">
             <div className="font-mono text-sm text-muted-foreground mb-4">Practical magic on Hyperliquid</div>
             <div className="flex justify-center space-x-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="https://x.com/Hyper_Faith" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 Twitter
               </a>
               <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
