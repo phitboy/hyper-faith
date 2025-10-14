@@ -198,19 +198,23 @@ export default function Mint() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <h1 className="font-mono text-4xl md:text-6xl font-bold">Forge Your Omamori</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ancient talismans for the modern trader. 100% of HYPE offered supports the assistance fund.
-          </p>
-        </div>
+        {/* Hero Section - Only show on Step 1 */}
+        {currentStep === 'intention' && (
+          <>
+            <div className="text-center space-y-4">
+              <h1 className="font-mono text-4xl md:text-6xl font-bold">Forge Your Omamori</h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Ancient talismans for the modern trader. 100% of HYPE offered supports the assistance fund.
+              </p>
+            </div>
 
-        {/* Returning User Banner */}
-        {userMintCount > 0 && <ReturningUserBanner mintCount={userMintCount} />}
+            {/* Returning User Banner */}
+            {userMintCount > 0 && <ReturningUserBanner mintCount={userMintCount} />}
+          </>
+        )}
 
         {/* Step-based Content */}
-        <div className="min-h-[600px]">
+        <div className={`min-h-[600px] ${currentStep !== 'intention' ? 'pt-8' : ''}`}>
           {currentStep === 'intention' && (
             <IntentionPicker onSelect={handleSelectIntention} />
           )}
