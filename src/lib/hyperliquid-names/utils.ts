@@ -49,7 +49,7 @@ export function namehash(name: string): `0x${string}` {
   const labels = normalizedName.split('.')
   
   // Start with the hash of the empty string (32 zero bytes)
-  let hash = new Uint8Array(32)
+  let hash: Uint8Array = new Uint8Array(32)
   
   // Process labels from right to left (TLD first)
   for (let i = labels.length - 1; i >= 0; i--) {
@@ -58,7 +58,7 @@ export function namehash(name: string): `0x${string}` {
     
     // Concatenate current hash with label hash and hash the result
     const combined = concat([hash, labelHash])
-    hash = toBytes(keccak256(combined))
+    hash = new Uint8Array(toBytes(keccak256(combined)))
   }
   
   return toHex(hash)
