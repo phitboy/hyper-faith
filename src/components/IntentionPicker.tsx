@@ -24,15 +24,15 @@ export function IntentionPicker({ onSelect }: IntentionPickerProps) {
           <Card
             key={major.id}
             onClick={() => onSelect(major.id)}
-            className="group relative p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary hover:shadow-lg hover:shadow-primary/20 min-h-[200px] flex flex-col items-center justify-center text-center"
+            className="group relative p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary hover:shadow-lg hover:shadow-primary/20 min-h-[200px] flex flex-col items-center justify-center text-center overflow-hidden"
           >
             {/* Glyph - Hidden by default, fades in on hover */}
-            <div className="absolute top-4 left-0 right-0 font-mono text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 glyph pointer-events-none whitespace-pre-line">
+            <div className="absolute inset-0 flex items-center justify-center font-mono text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 glyph pointer-events-none whitespace-pre-line">
               {major.glyph}
             </div>
 
-            {/* Intention Statement - Always visible */}
-            <div className="mt-auto font-serif italic text-sm md:text-base leading-relaxed text-foreground/90">
+            {/* Intention Statement - Always visible, fades on hover */}
+            <div className="font-serif italic text-sm md:text-base leading-relaxed text-foreground/90 group-hover:opacity-0 transition-opacity duration-300">
               "{major.intention}"
             </div>
           </Card>
