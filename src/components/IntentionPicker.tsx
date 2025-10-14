@@ -6,11 +6,6 @@ interface IntentionPickerProps {
 }
 
 export function IntentionPicker({ onSelect }: IntentionPickerProps) {
-  const handleCardClick = (majorId: number, majorName: string) => {
-    console.log('IntentionPicker: Card clicked', { majorId, majorName });
-    onSelect(majorId);
-  };
-
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Header */}
@@ -28,7 +23,7 @@ export function IntentionPicker({ onSelect }: IntentionPickerProps) {
         {majorsData.map((major) => (
           <Card
             key={major.id}
-            onClick={() => handleCardClick(major.id, major.name)}
+            onClick={() => onSelect(major.id)}
             className="group relative p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary hover:shadow-lg hover:shadow-primary/20 min-h-[200px] flex flex-col items-center justify-center text-center overflow-hidden"
           >
             {/* Glyph - Hidden by default, fades in on hover */}
