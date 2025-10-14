@@ -21,7 +21,7 @@ export function RevelationAndAspects({
   }
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Back Button */}
       <Button
         variant="ghost"
@@ -32,26 +32,28 @@ export function RevelationAndAspects({
         Change Intent
       </Button>
 
-      {/* Large Major Glyph */}
-      <div className="text-center space-y-4">
-        <div className="font-mono text-6xl md:text-8xl leading-tight glyph whitespace-pre-line">
-          {major.glyph}
+      {/* Compact Major Header */}
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-4">
+          <div className="font-mono text-3xl md:text-4xl leading-tight glyph whitespace-pre-line">
+            {major.glyph}
+          </div>
+          <h2 className="font-mono text-3xl md:text-4xl font-bold">
+            {major.name}
+          </h2>
         </div>
-        <h2 className="font-mono text-3xl md:text-4xl font-bold">
-          {major.name}
-        </h2>
       </div>
 
       {/* Revelation Text */}
-      <Card className="p-8 bg-card/50 backdrop-blur border-2">
-        <p className="font-serif text-lg md:text-xl leading-relaxed text-center italic">
+      <Card className="p-4 md:p-6 bg-card/50 backdrop-blur border-2">
+        <p className="font-serif text-base md:text-lg leading-relaxed text-center italic">
           {major.revelation}
         </p>
       </Card>
 
       {/* Aspect Selection */}
-      <div className="space-y-4">
-        <h3 className="text-xl md:text-2xl font-mono font-bold text-center">
+      <div className="space-y-3">
+        <h3 className="text-lg md:text-xl font-mono font-bold text-center">
           Choose Your Blessing
         </h3>
         

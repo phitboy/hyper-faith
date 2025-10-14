@@ -126,20 +126,20 @@ export function PreviewAndOffering({
   const currentExample = previewExamples[currentExampleIndex];
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Back Button */}
       <Button variant="ghost" onClick={onBack} className="gap-2 font-mono">
         <ChevronLeft className="w-4 h-4" />
         Change Blessing
       </Button>
 
-      {/* Your Selection Summary */}
+      {/* Compact Selection Summary */}
       <div className="text-center space-y-2">
-        <div className="font-mono text-5xl glyph whitespace-pre-line">{major?.glyph || ''}</div>
-        <h2 className="text-2xl md:text-3xl font-mono font-bold">
-          {major?.name} • {minor?.name}
-        </h2>
-        <p className="text-muted-foreground font-serif italic">
+        <div className="flex items-center justify-center gap-3 text-xl md:text-2xl font-mono font-bold">
+          <span className="glyph whitespace-pre-line text-lg">{major?.glyph || ''}</span>
+          <span>{major?.name} • {minor?.name}</span>
+        </div>
+        <p className="text-sm text-muted-foreground font-serif italic">
           "{minor?.blessing}"
         </p>
       </div>
