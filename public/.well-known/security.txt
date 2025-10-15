@@ -1,0 +1,11 @@
+Contact: https://github.com/phitboy/hyper-faith/security
+Canonical: https://hyper.faith/.well-known/security.txt
+Preferred-Languages: en
+
+# Smart Contract Details
+# Contract Address: 0xeC80195C13e99e89e295F6ac05888811c3eB5380
+# Network: HyperEVM (Chain ID: 998)
+# Repository: https://github.com/phitboy/hyper-faith
+# Audited: Yes
+# Purpose: NFT Minting (Omamori Collection)
+
