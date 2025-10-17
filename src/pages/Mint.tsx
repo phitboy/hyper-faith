@@ -199,7 +199,7 @@ export default function Mint() {
         {currentStep === 'intention' && <>
             <div className="text-center space-y-4">
               <h1 className="font-mono text-4xl md:text-6xl font-bold">Burn $HYPE,Get Blessed</h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Ancient talismans for the modern trader.  
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Ancient talismans for the modern trader. 
 100% of HYPE offered supports the assistance fund.</p>
             </div>
 
