@@ -98,8 +98,8 @@ export function Layout({
               <a href="https://x.com/Hyper_Faith" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 Twitter
               </a>
-              <a href="https://hyperevmscan.io/address/0x2d15f5b36e6a034f89b9591fbfcc98fc71a039b2" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contract
+              <a href="https://paragraph.com/@hyperfaith" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                Lore
               </a>
               <a href="https://github.com/phitboy/hyper-faith" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 GitHub
