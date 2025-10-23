@@ -3,16 +3,17 @@ import {
   metaMaskWallet,
   rabbyWallet,
   rainbowWallet,
-  walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { hyperEVM } from './chains'
 
 /**
  * Wagmi configuration for HyperEVM with multi-wallet support
+ * Note: WalletConnect removed to avoid configuration dependencies
+ * Rainbow wallet provides mobile support via native mobile app
  */
 export const config = getDefaultConfig({
   appName: 'Hyper Faith Omamori',
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'your-project-id', // Get from WalletConnect Cloud
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'default-id', // Required by RainbowKit but not used
   chains: [hyperEVM],
   wallets: [
     {
@@ -21,12 +22,6 @@ export const config = getDefaultConfig({
         metaMaskWallet,
         rabbyWallet,
         rainbowWallet,
-      ],
-    },
-    {
-      groupName: 'Mobile',
-      wallets: [
-        walletConnectWallet,
       ],
     },
   ],
